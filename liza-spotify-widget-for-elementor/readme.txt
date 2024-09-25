@@ -1,9 +1,9 @@
 === Liza Spotify Widget For Elementor ===
 Contributors: fallentroj
 Tags: elementor, Spotify, widgets for elementor, Music, Spotify Embed, Embed Music, Spotify Widget, Embed content, Wordpress, Spotify for elementor,music widget, Spotify elementor, Embed, iframe, widget for elementor spotify
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 Requires at least: 5.2
-Tested up to: 6.2.0
+Tested up to: 6.6.2
 Requires PHP: 7.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html

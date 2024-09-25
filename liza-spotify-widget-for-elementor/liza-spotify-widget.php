@@ -4,15 +4,15 @@
  * liza Spotify Widget For Elementor
  *
  * @author            Nick Sirbiladze
- * @copyright         2022 Nick Sirbiladze
+ * @copyright         2021 Nick Sirbiladze
  * @license           GPL-2.0-or-later
  *
  * @wordpress-plugin
  * Plugin Name:       Liza Spotify Widget For Elementor
  * Plugin URI:        https://stagg.live/spotify
  * Description:       Spotify Widget For Elementor
- * Version:           1.2.1
- * tested up to:      6.2.0
+ * Version:           1.2.2
+ * Tested up to:      6.6.2
  * Requires at least: 5.2
  * Requires PHP:      7.0
  * Author:            Nick Sirbiladze
@@ -147,7 +147,7 @@ final class liza_spotify {
     public function admin_notice_missing_main_plugin() {
 
         $plugin = 'elementor/elementor.php';
-        $elementorPath = wp_nonce_url( self_admin_url( 'update.php?action=install-plugin&plugin=elementor' ), 'install-plugin_elementor' );
+        $elementorPath = wp_nonce_url( 'plugins.php?action=activate&amp;plugin=' . $plugin . '&amp;plugin_status=all&amp;paged=1&amp;s', 'activate-plugin_' . $plugin );
         if( isset( $_GET[ 'activate' ] ) ) unset( $_GET[ 'activate' ] );
         $message = sprintf(
             esc_html__( '%1$s requires %2$s to be installed and activated %3$s', 'liza-spotify' ),
