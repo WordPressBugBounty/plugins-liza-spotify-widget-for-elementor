@@ -1,7 +1,7 @@
 === Liza Spotify Widget For Elementor ===
-Contributors: fallentroj
+Contributors: fallentroj, freemius
 Tags: elementor, Spotify, widgets for elementor, Music, Spotify Embed, Embed Music, Spotify Widget, Embed content, Wordpress, Spotify for elementor,music widget, Spotify elementor, Embed, iframe, widget for elementor spotify
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 Requires at least: 5.2
 Tested up to: 6.7.1
 Requires PHP: 7.0
@@ -21,7 +21,6 @@ With love, Rutheless WP
 
 *See tutorials Below*
 
-* [**How to Use The Main Widget?**](https://youtu.be/-RgbQk9zW6c)
-* [**How to Use The Main Widget?(article)**](https://dustinmsk.medium.com/how-to-integrate-spotify-on-your-elementor-wordpress-website-5212d97234a0)
+* [**How to setup the Spotify API?**](https://youtu.be/HbL8ERGBquk?si=8ErHDMorbyG8iAPK)
+* [**How to Use The Embed Widget?(article)**](https://youtu.be/FvQC-_KVtBU?si=jE01UfV4lKaF5raE)
 
-https://www.youtube.com/watch?v=-RgbQk9zW6c

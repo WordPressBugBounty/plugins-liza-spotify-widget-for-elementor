@@ -5,8 +5,8 @@ class Settings {
     private $spotify_client;
 
     public function __construct() {
-        add_action('admin_menu', [$this, 'add_admin_menu']);
-        add_action('admin_init', [$this, 'init_settings']);
+        add_action('admin_menu', [$this, 'add_plugin_page']);
+        add_action('admin_init', [$this, 'page_init']);
         
         // Handle Spotify OAuth callback and disconnection
         add_action('admin_init', [$this, 'handle_spotify_callback']);
@@ -15,53 +15,32 @@ class Settings {
         // Add dashboard widget
         add_action('wp_dashboard_setup', [$this, 'add_dashboard_widget']);
         
+        add_action('wp_ajax_dismiss_ruthless_promo', [$this, 'dismiss_promo']);
+        
         $this->spotify_client = new \LizaSpotify\SpotifyAPI\Client();
     }
 
-    public function add_admin_menu() {
+    public function add_plugin_page() {
         add_menu_page(
-            __('Liza Spotify Settings', 'liza-spotify'),
+            __('Liza Spotify', 'liza-spotify'),
             __('Liza Spotify', 'liza-spotify'),
             'manage_options',
             'liza-spotify-settings',
-            [$this, 'render_settings_page'],
+            [$this, 'create_admin_page'],
             'dashicons-spotify'
         );
-    }
 
-    public function init_settings() {
-        register_setting('liza_spotify_settings', 'liza_spotify_client_id');
-        register_setting('liza_spotify_settings', 'liza_spotify_client_secret');
-
-        add_settings_section(
-            'liza_spotify_settings_section',
-            __('Spotify API Settings', 'liza-spotify'),
-            [$this, 'render_section_info'],
-            'liza_spotify_settings'
-        );
-
-        add_settings_field(
-            'liza_spotify_client_id',
-            __('Client ID', 'liza-spotify'),
-            [$this, 'render_client_id_field'],
-            'liza_spotify_settings',
-            'liza_spotify_settings_section'
-        );
-
-        add_settings_field(
-            'liza_spotify_client_secret',
-            __('Client Secret', 'liza-spotify'),
-            [$this, 'render_client_secret_field'],
-            'liza_spotify_settings',
-            'liza_spotify_settings_section'
+        add_submenu_page(
+            'liza-spotify-settings',
+            __('Settings', 'liza-spotify'),
+            __('Settings', 'liza-spotify'),
+            'manage_options',
+            'liza-spotify-settings',
+            [$this, 'create_admin_page']
         );
     }
 
-    public function render_settings_page() {
-        if (!current_user_can('manage_options')) {
-            return;
-        }
-
+    public function create_admin_page() {
         // Show admin notices
         settings_errors('liza_spotify_messages');
 
@@ -71,26 +50,19 @@ class Settings {
         }
         ?>
         <div class="wrap">
-            <div class="title-section" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                <h1 style="margin: 0; padding: 0;"><?= esc_html(get_admin_page_title()); ?></h1>
-                <a href="#" class="page-title-action pro-btn" style="margin: 0; background: #1DB954; color: #fff; border-color: #1aa549; font-weight: 500;">
-                    <?php _e('Go Pro', 'liza-spotify'); ?> 
-                    <span class="dashicons dashicons-star-filled" style="font-size: 14px; width: 14px; height: 14px; margin-left: 4px; vertical-align: text-bottom;"></span>
-                </a>
-            </div>
-            
-            <form action="options.php" method="post">
+            <h2><?php echo esc_html__('Liza Spotify Settings', 'liza-spotify'); ?></h2>
+            <form method="post" action="options.php">
                 <?php
-                settings_fields('liza_spotify_settings');
-                do_settings_sections('liza_spotify_settings');
-                submit_button(__('Save Settings', 'liza-spotify'));
+                settings_fields('liza_spotify_options');
+                do_settings_sections('liza-spotify-settings');
+                submit_button();
                 ?>
             </form>
 
-            <div class="spotify-auth-section">
+            <div class="spotify-auth-section" style="margin-top: 30px;">
                 <h2><?php _e('Spotify Authentication', 'liza-spotify'); ?></h2>
                 <?php if ($profile): ?>
-                    <div class="spotify-profile">
+                    <div class="spotify-profile" style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin-top: 15px; text-align: center;">
                         <?php if (!empty($profile['images'][0]['url'])): ?>
                             <img src="<?php echo esc_url($profile['images'][0]['url']); ?>" 
                                  alt="<?php echo esc_attr($profile['display_name']); ?>"
@@ -98,61 +70,81 @@ class Settings {
                         <?php endif; ?>
                         <p><?php printf(__('Connected as: %s', 'liza-spotify'), esc_html($profile['display_name'])); ?></p>
                         <p><?php printf(__('Email: %s', 'liza-spotify'), esc_html($profile['email'])); ?></p>
-                        <p><a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=liza-spotify-settings&disconnect=1'), 'spotify_disconnect')); ?>" 
-                              class="button" 
-                              onclick="return confirm('<?php esc_attr_e('Are you sure you want to disconnect your Spotify account?', 'liza-spotify'); ?>');">
-                            <?php _e('Disconnect', 'liza-spotify'); ?>
-                        </a></p>
+                        <p>
+                            <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=liza-spotify-settings&disconnect=1'), 'spotify_disconnect')); ?>" 
+                               class="button" 
+                               onclick="return confirm('<?php esc_attr_e('Are you sure you want to disconnect your Spotify account?', 'liza-spotify'); ?>');">
+                                <?php _e('Disconnect', 'liza-spotify'); ?>
+                            </a>
+                        </p>
                     </div>
                 <?php else: ?>
-                    <div class="spotify-profile not-connected">
+                    <div class="spotify-profile not-connected" style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin-top: 15px; text-align: center; border-left: 4px solid #dc3232;">
                         <p><?php _e('No Spotify account connected.', 'liza-spotify'); ?></p>
-                        <p><a href="<?php echo esc_url($this->spotify_client->get_auth_url()); ?>" class="button button-primary"><?php _e('Connect with Spotify', 'liza-spotify'); ?></a></p>
+                        <p>
+                            <a href="<?php echo esc_url($this->spotify_client->get_auth_url()); ?>" 
+                               class="button button-primary">
+                                <?php _e('Connect with Spotify', 'liza-spotify'); ?>
+                            </a>
+                        </p>
                     </div>
                 <?php endif; ?>
             </div>
-
-            <style>
-                .spotify-profile {
-                    background: #f9f9f9;
-                    padding: 20px;
-                    border-radius: 5px;
-                    margin-top: 15px;
-                    text-align: center;
-                }
-                .spotify-profile.not-connected {
-                    border-left: 4px solid #dc3232;
-                }
-                .spotify-profile img {
-                    display: block;
-                    margin: 0 auto 15px;
-                }
-                .pro-btn:hover {
-                    background: #1ed760 !important;
-                    border-color: #1aa549 !important;
-                    color: #fff !important;
-                }
-                .pro-btn:focus {
-                    box-shadow: 0 0 0 1px #fff, 0 0 0 3px #1DB954 !important;
-                    color: #fff !important;
-                }
-            </style>
         </div>
         <?php
     }
 
-    public function render_section_info() {
+    public function page_init() {
+        register_setting(
+            'liza_spotify_options',
+            'liza_spotify_client_id'
+        );
+
+        register_setting(
+            'liza_spotify_options',
+            'liza_spotify_client_secret'
+        );
+
+        add_settings_section(
+            'liza_spotify_setting_section',
+            __('Spotify API Settings', 'liza-spotify'),
+            [$this, 'section_info'],
+            'liza-spotify-settings'
+        );
+
+        add_settings_field(
+            'client_id',
+            __('Client ID', 'liza-spotify'),
+            [$this, 'client_id_callback'],
+            'liza-spotify-settings',
+            'liza_spotify_setting_section'
+        );
+
+        add_settings_field(
+            'client_secret',
+            __('Client Secret', 'liza-spotify'),
+            [$this, 'client_secret_callback'],
+            'liza-spotify-settings',
+            'liza_spotify_setting_section'
+        );
+    }
+
+    public function section_info() {
         echo '<p>' . esc_html__('Enter your Spotify API credentials below. You can get these by creating an application in the Spotify Developer Dashboard.', 'liza-spotify') . '</p>';
     }
 
-    public function render_client_id_field() {
-        $client_id = get_option('liza_spotify_client_id');
-        echo '<input type="text" name="liza_spotify_client_id" value="' . esc_attr($client_id) . '" class="regular-text">';
+    public function client_id_callback() {
+        printf(
+            '<input type="text" id="client_id" name="liza_spotify_client_id" value="%s" class="regular-text" />',
+            esc_attr(get_option('liza_spotify_client_id'))
+        );
     }
 
-    public function render_client_secret_field() {
-        $client_secret = get_option('liza_spotify_client_secret');
-        echo '<input type="password" name="liza_spotify_client_secret" value="' . esc_attr($client_secret) . '" class="regular-text">';
+    public function client_secret_callback() {
+        printf(
+            '<input type="password" id="client_secret" name="liza_spotify_client_secret" value="%s" class="regular-text" />',
+            esc_attr(get_option('liza_spotify_client_secret'))
+        );
     }
 
     public function handle_spotify_callback() {
@@ -282,5 +274,11 @@ class Settings {
             }
         </style>
         <?php
+    }
+
+    public function dismiss_promo() {
+        check_ajax_referer('dismiss_ruthless_promo', 'nonce');
+        update_user_meta(get_current_user_id(), 'ruthless_promo_dismissed', time());
+        wp_send_json_success();
     }
 } 
