@@ -41,6 +41,7 @@ class Settings {
     }
 
     public function create_admin_page() {
+        global $liza_spotify_fs;
         // Show admin notices
         settings_errors('liza_spotify_messages');
 
@@ -50,7 +51,31 @@ class Settings {
         }
         ?>
         <div class="wrap">
-            <h2><?php echo esc_html__('Liza Spotify Settings', 'liza-spotify'); ?></h2>
+            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+
+            <?php
+            // Show upgrade notice for free users
+            if (!$liza_spotify_fs->can_use_premium_code() && !$liza_spotify_fs->is_trial()) {
+                ?>
+                <div class="notice notice-info is-dismissible" style="padding: 20px; border-left-color: #2271b1;">
+                    <h3 style="margin-top: 0;"><?php _e('Upgrade to Pro Version', 'liza-spotify'); ?></h3>
+                    <p><?php _e('Get access to premium features:', 'liza-spotify'); ?></p>
+                    <ul style="list-style-type: disc; margin-left: 20px;">
+                        <li><?php _e('Now Playing Widget - Display currently playing track', 'liza-spotify'); ?></li>
+                        <li><?php _e('Artist Widget - Show artist profiles with stats', 'liza-spotify'); ?></li>
+                        <li><?php _e('Apple Music Integration - Embed Apple Music content', 'liza-spotify'); ?></li>
+                        <li><?php _e('Priority Support', 'liza-spotify'); ?></li>
+                    </ul>
+                    <p>
+                        <a href="<?php echo esc_url($liza_spotify_fs->get_upgrade_url()); ?>" class="button button-primary">
+                            <?php _e('Upgrade Now', 'liza-spotify'); ?>
+                        </a>
+                    </p>
+                </div>
+                <?php
+            }
+            ?>
+
             <form method="post" action="options.php">
                 <?php
                 settings_fields('liza_spotify_options');
@@ -95,6 +120,7 @@ class Settings {
     }
 
     public function page_init() {
+        // Spotify Settings
         register_setting(
             'liza_spotify_options',
             'liza_spotify_client_id'
