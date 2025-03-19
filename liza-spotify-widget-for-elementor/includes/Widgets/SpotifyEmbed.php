@@ -25,18 +25,54 @@ class SpotifyEmbed extends Widget_Base {
         $this->start_controls_section(
             'content_section',
             [
-                'label' => __('Spotify URL', 'liza-spotify'),
+                'label' => __('Spotify Content', 'liza-spotify'),
                 'tab' => Controls_Manager::TAB_CONTENT,
+            ]
+        );
+
+        $this->add_control(
+            'search_type',
+            [
+                'label' => __('Content Type', 'liza-spotify'),
+                'type' => Controls_Manager::SELECT,
+                'default' => 'track',
+                'options' => [
+                    'track' => __('Track', 'liza-spotify'),
+                    'album' => __('Album', 'liza-spotify'),
+                    'artist' => __('Artist', 'liza-spotify'),
+                    'playlist' => __('Playlist', 'liza-spotify'),
+                    'episode' => __('Episode', 'liza-spotify'),
+                    'show' => __('Show', 'liza-spotify'),
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'search_query',
+            [
+                'label' => __('Search Spotify', 'liza-spotify'),
+                'type' => Controls_Manager::RAW_HTML,
+                'raw' => '<div class="elementor-control-field">
+                    <div class="spotify-search-wrapper">
+                        <div class="spotify-search-input">
+                            <input type="text" class="spotify-search-field elementor-control-input-text" placeholder="' . esc_attr__('Type to search...', 'liza-spotify') . '">
+                            <button type="button" class="spotify-search-button elementor-button elementor-button-default">
+                                <i class="eicon-search"></i>
+                            </button>
+                        </div>
+                        <div class="spotify-search-results"></div>
+                    </div>
+                </div>',
+                'content_classes' => 'elementor-control-field',
             ]
         );
 
         $this->add_control(
             'spotify_url',
             [
-                'label' => __('Spotify URL', 'liza-spotify'),
-                'type' => Controls_Manager::TEXT,
-                'placeholder' => 'https://open.spotify.com/track/...',
-                'description' => __('Enter the Spotify URL for track, album, artist, playlist, or podcast.', 'liza-spotify'),
+                'label' => __('Selected Content', 'liza-spotify'),
+                'type' => Controls_Manager::HIDDEN,
+                'default' => '',
             ]
         );
 
@@ -45,10 +81,10 @@ class SpotifyEmbed extends Widget_Base {
             [
                 'label' => __('Theme', 'liza-spotify'),
                 'type' => Controls_Manager::SELECT,
-                'default' => '0',
+                'default' => 'dark',
                 'options' => [
-                    '0' => __('Black', 'liza-spotify'),
-                    '1' => __('White', 'liza-spotify'),
+                    'dark' => __('Dark', 'liza-spotify'),
+                    'light' => __('Light', 'liza-spotify'),
                 ],
             ]
         );
@@ -92,6 +128,18 @@ class SpotifyEmbed extends Widget_Base {
         );
 
         $this->add_control(
+            'height',
+            [
+                'label' => __('Height', 'liza-spotify'),
+                'type' => Controls_Manager::NUMBER,
+                'default' => 380,
+                'min' => 80,
+                'max' => 1000,
+                'step' => 1,
+            ]
+        );
+
+        $this->add_control(
             'alignment',
             [
                 'label' => __('Alignment', 'liza-spotify'),
@@ -122,37 +170,53 @@ class SpotifyEmbed extends Widget_Base {
 
     protected function render() {
         $settings = $this->get_settings_for_display();
-        
-        if (empty($settings['spotify_url'])) {
-            echo '<div class="spotify-embed-error">' . __('Please enter a Spotify URL.', 'liza-spotify') . '</div>';
+        $spotify_url = $settings['spotify_url'] ?? '';
+
+        if (empty($spotify_url)) {
+            echo '<div class="spotify-embed-error">' . __('Please enter a valid Spotify URL.', 'liza-spotify') . '</div>';
             return;
         }
 
-        // Extract the Spotify URI from the URL
-        preg_match('/spotify\.com\/(track|album|artist|playlist|episode|show)\/([a-zA-Z0-9]+)/', $settings['spotify_url'], $matches);
-        
-        if (empty($matches[1]) || empty($matches[2])) {
-            echo '<div class="spotify-embed-error">' . __('Invalid Spotify URL.', 'liza-spotify') . '</div>';
+        // Extract Spotify ID from URL
+        preg_match('/spotify\.com\/(track|album|artist|playlist|episode|show)\/([a-zA-Z0-9]+)/', $spotify_url, $matches);
+        if (empty($matches[2])) {
+            echo '<div class="spotify-embed-error">' . __('Invalid Spotify URL format.', 'liza-spotify') . '</div>';
             return;
         }
 
-        $type = $matches[1];
-        $id = $matches[2];
-        $theme = $settings['theme'];
+        $spotify_id = $matches[2];
+        $spotify_type = $matches[1];
 
-        $embed_url = "https://open.spotify.com/embed/{$type}/{$id}?theme={$theme}";
-        
-        ?>
-        <div class="spotify-embed-wrapper">
-            <iframe 
-                src="<?php echo esc_url($embed_url); ?>"
-                width="100%" 
-                height="352" 
-                frameborder="0" 
-                allowtransparency="true" 
-                allow="encrypted-media"
-            ></iframe>
-        </div>
-        <?php
+        // Generate embed URL
+        $embed_url = "https://open.spotify.com/embed/{$spotify_type}/{$spotify_id}";
+        if ($settings['theme'] === 'dark') {
+            $embed_url .= '?theme=0';
+        } else {
+            $embed_url .= '?theme=1';
+        }
+
+        // Get width from settings
+        $width = '';
+        if (isset($settings['width']['size']) && isset($settings['width']['unit'])) {
+            $width = $settings['width']['size'] . $settings['width']['unit'];
+        }
+
+        // Render the embed iframe
+        echo '<div class="spotify-embed-wrapper"' . ($width ? ' style="width: ' . esc_attr($width) . ';"' : '') . '>';
+        echo '<iframe src="' . esc_url($embed_url) . '" 
+                      width="100%" 
+                      height="' . esc_attr($settings['height']) . '" 
+                      frameborder="0" 
+                      allowtransparency="true" 
+                      allow="encrypted-media"></iframe>';
+        echo '</div>';
+    }
+
+    public function get_script_depends() {
+        return ['spotify-embed'];
+    }
+
+    public function get_style_depends() {
+        return ['spotify-embed'];
     }
 } 

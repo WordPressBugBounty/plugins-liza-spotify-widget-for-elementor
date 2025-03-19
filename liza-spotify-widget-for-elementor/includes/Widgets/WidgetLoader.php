@@ -14,7 +14,6 @@ class WidgetLoader {
         global $liza_spotify_fs;
         if ($liza_spotify_fs->can_use_premium_code()) {
             remove_action('elementor/editor/footer', [Plugin::instance()->common, 'print_template_views']);
-            add_action('elementor/editor/footer', [$this, 'print_template_views_without_pro']);
         }
     }
 
@@ -56,16 +55,6 @@ class WidgetLoader {
             if ($liza_spotify_fs->can_use_premium_code() || $liza_spotify_fs->is_trial()) {
                 echo '<div class="notice notice-error"><p>Apple Music Embed widget is not registered properly.</p></div>';
             }
-        }
-    }
-
-    public function print_template_views_without_pro() {
-        // Get all template views except the pro button
-        $template_views = Plugin::instance()->common->get_template_views();
-        unset($template_views['go-pro']);
-        
-        foreach ($template_views as $view) {
-            $view->print_template();
         }
     }
 } 

@@ -119,6 +119,14 @@ class Client {
         return $this->make_request('GET', '/artists/' . $artist_id . '/top-tracks', ['market' => $market]);
     }
 
+    public function search($query, $type = 'track', $limit = 5) {
+        return $this->make_request('GET', '/search', [
+            'q' => $query,
+            'type' => $type,
+            'limit' => $limit
+        ]);
+    }
+
     private function make_request($method, $endpoint, $params = array()) {
         if (time() > get_option('liza_spotify_token_expiry', 0)) {
             if (!$this->refresh_token()) {

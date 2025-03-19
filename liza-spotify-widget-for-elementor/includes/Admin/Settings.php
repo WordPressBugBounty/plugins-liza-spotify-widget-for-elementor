@@ -3,9 +3,18 @@ namespace LizaSpotify\Admin;
 
 class Settings {
     private $spotify_client;
+    private $fs;
 
     public function __construct() {
-        add_action('admin_menu', [$this, 'add_plugin_page']);
+        // Initialize Freemius
+        if (!function_exists('liza_spotify_fs')) {
+            return;
+        }
+        
+        $this->fs = liza_spotify_fs();
+        
+        // Register menu with lower priority to ensure it runs after Freemius
+        add_action('admin_menu', [$this, 'add_plugin_page'], 99);
         add_action('admin_init', [$this, 'page_init']);
         
         // Handle Spotify OAuth callback and disconnection
@@ -27,7 +36,8 @@ class Settings {
             'manage_options',
             'liza-spotify-settings',
             [$this, 'create_admin_page'],
-            'dashicons-spotify'
+            'dashicons-spotify',
+            30
         );
 
         add_submenu_page(
@@ -41,7 +51,10 @@ class Settings {
     }
 
     public function create_admin_page() {
-        global $liza_spotify_fs;
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have sufficient permissions to access this page.'));
+        }
+        
         // Show admin notices
         settings_errors('liza_spotify_messages');
 
@@ -53,10 +66,7 @@ class Settings {
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
-            <?php
-            // Show upgrade notice for free users
-            if (!$liza_spotify_fs->can_use_premium_code() && !$liza_spotify_fs->is_trial()) {
-                ?>
+            <?php if ($this->fs && !$this->fs->is_paying()): ?>
                 <div class="notice notice-info is-dismissible" style="padding: 20px; border-left-color: #2271b1;">
                     <h3 style="margin-top: 0;"><?php _e('Upgrade to Pro Version', 'liza-spotify'); ?></h3>
                     <p><?php _e('Get access to premium features:', 'liza-spotify'); ?></p>
@@ -67,14 +77,12 @@ class Settings {
                         <li><?php _e('Priority Support', 'liza-spotify'); ?></li>
                     </ul>
                     <p>
-                        <a href="<?php echo esc_url($liza_spotify_fs->get_upgrade_url()); ?>" class="button button-primary">
+                        <a href="<?php echo esc_url($this->fs->get_upgrade_url()); ?>" class="button button-primary">
                             <?php _e('Upgrade Now', 'liza-spotify'); ?>
                         </a>
                     </p>
                 </div>
-                <?php
-            }
-            ?>
+            <?php endif; ?>
 
             <form method="post" action="options.php">
                 <?php
@@ -115,22 +123,47 @@ class Settings {
                     </div>
                 <?php endif; ?>
             </div>
+
+            <div class="tutorials-section" style="margin-top: 30px;">
+                <h2><?php _e('Video Tutorials', 'liza-spotify'); ?></h2>
+                <div class="tutorials-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 15px;">
+                    <div class="tutorial-card" style="background: #f9f9f9; padding: 20px; border-radius: 5px; border-left: 4px solid #1DB954;">
+                        <h3 style="margin-top: 0;"><?php _e('Getting Started with Liza Spotify', 'liza-spotify'); ?></h3>
+                        <p><?php _e('Learn how to set up and use the Liza Spotify plugin for WordPress.', 'liza-spotify'); ?></p>
+                        <a href="https://www.youtube.com/watch?v=HbL8ERGBquk" target="_blank" class="button button-primary">
+                            <span class="dashicons dashicons-video-alt3" style="vertical-align: middle; margin-right: 5px;"></span>
+                            <?php _e('Watch Tutorial', 'liza-spotify'); ?>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
         <?php
     }
 
     public function page_init() {
-        // Spotify Settings
+        // Register settings
         register_setting(
             'liza_spotify_options',
-            'liza_spotify_client_id'
+            'liza_spotify_client_id',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
         );
 
         register_setting(
             'liza_spotify_options',
-            'liza_spotify_client_secret'
+            'liza_spotify_client_secret',
+            array(
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default' => ''
+            )
         );
 
+        // Add settings section
         add_settings_section(
             'liza_spotify_setting_section',
             __('Spotify API Settings', 'liza-spotify'),
@@ -138,8 +171,9 @@ class Settings {
             'liza-spotify-settings'
         );
 
+        // Add settings fields
         add_settings_field(
-            'client_id',
+            'liza_spotify_client_id',
             __('Client ID', 'liza-spotify'),
             [$this, 'client_id_callback'],
             'liza-spotify-settings',
@@ -147,7 +181,7 @@ class Settings {
         );
 
         add_settings_field(
-            'client_secret',
+            'liza_spotify_client_secret',
             __('Client Secret', 'liza-spotify'),
             [$this, 'client_secret_callback'],
             'liza-spotify-settings',
@@ -160,17 +194,25 @@ class Settings {
     }
 
     public function client_id_callback() {
-        printf(
-            '<input type="text" id="client_id" name="liza_spotify_client_id" value="%s" class="regular-text" />',
-            esc_attr(get_option('liza_spotify_client_id'))
-        );
+        $value = get_option('liza_spotify_client_id');
+        ?>
+        <input type="text" 
+               id="liza_spotify_client_id" 
+               name="liza_spotify_client_id" 
+               value="<?php echo esc_attr($value); ?>" 
+               class="regular-text" />
+        <?php
     }
 
     public function client_secret_callback() {
-        printf(
-            '<input type="password" id="client_secret" name="liza_spotify_client_secret" value="%s" class="regular-text" />',
-            esc_attr(get_option('liza_spotify_client_secret'))
-        );
+        $value = get_option('liza_spotify_client_secret');
+        ?>
+        <input type="password" 
+               id="liza_spotify_client_secret" 
+               name="liza_spotify_client_secret" 
+               value="<?php echo esc_attr($value); ?>" 
+               class="regular-text" />
+        <?php
     }
 
     public function handle_spotify_callback() {
