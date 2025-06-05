@@ -231,4 +231,217 @@
 
 .spotify-widget-config-notice a:hover {
     text-decoration: underline;
+}
+
+.elementor-control-search_results .spotify-search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #d5dadf;
+    border-radius: 3px;
+}
+
+.elementor-control-search_results .spotify-search-loading,
+.elementor-control-search_results .spotify-search-error,
+.elementor-control-search_results .spotify-search-no-results {
+    padding: 10px;
+    text-align: center;
+    color: #6d7882;
+    font-size: 12px;
+}
+
+.elementor-control-search_results .spotify-search-error {
+    color: #dc3232;
+}
+
+.elementor-control-search_results .spotify-search-list {
+    padding: 5px;
+}
+
+.elementor-control-search_results .spotify-search-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.elementor-control-search_results .spotify-search-item:hover {
+    background-color: #f1f3f5;
+}
+
+.elementor-control-search_results .spotify-search-item-image {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.elementor-control-search_results .spotify-search-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 3px;
+}
+
+.elementor-control-search_results .spotify-search-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.elementor-control-search_results .spotify-search-item-title {
+    font-weight: 500;
+    font-size: 13px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.elementor-control-search_results .spotify-search-item-subtitle {
+    font-size: 12px;
+    color: #a4afb7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Hide the URL field since we're using a hidden input */
+.elementor-control-spotify_url {
+    display: none !important;
+}
+
+/* Add some spacing between controls */
+.elementor-control-search_field {
+    margin-bottom: 10px;
+}
+
+/* Style the search input */
+.elementor-control-search_field input[type="search"] {
+    padding-right: 30px;
+    background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23a4afb7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat center right 8px;
+    background-size: 16px;
+}
+
+/* Elementor Panel Styles */
+.elementor-control-spotify-search-wrapper {
+    margin-bottom: 15px;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #d5dadf;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-loading,
+.elementor-control-spotify-search-wrapper .spotify-search-error,
+.elementor-control-spotify-search-wrapper .spotify-search-no-results {
+    padding: 10px;
+    text-align: center;
+    color: #6d7882;
+    font-size: 12px;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-error {
+    color: #dc3232;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+    background: #f8f9fa;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-item:hover {
+    background-color: #e9ecef;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-item-image {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 3px;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-item-title {
+    font-weight: 500;
+    font-size: 13px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #495157;
+}
+
+.elementor-control-spotify-search-wrapper .spotify-search-item-subtitle {
+    font-size: 12px;
+    color: #a4afb7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Style the content type select */
+.elementor-control-search_type select {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #d5dadf;
+    border-radius: 3px;
+    background-color: #fff;
+    color: #495157;
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+/* Ensure the search wrapper is visible */
+.spotify-search-wrapper {
+    display: block !important;
+    margin-bottom: 15px;
+}
+
+/* Ensure the search results are visible */
+.spotify-search-results-wrapper {
+    display: block !important;
+    margin-top: 10px;
+}
+
+/* Style the search results container */
+.spotify-search-results {
+    display: block !important;
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #d5dadf;
+    border-radius: 3px;
+    padding: 5px;
 } 

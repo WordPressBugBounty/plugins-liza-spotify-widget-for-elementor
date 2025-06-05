@@ -10,25 +10,24 @@ class Search {
     }
 
     public function handle_search() {
-        check_ajax_referer('spotify_search', 'nonce');
+        check_ajax_referer('liza_spotify_nonce', 'nonce');
 
-        $query = sanitize_text_field($_POST['query'] ?? '');
-        $type = sanitize_text_field($_POST['type'] ?? 'track');
-        $limit = intval($_POST['limit'] ?? 5);
-
-        if (empty($query)) {
-            wp_send_json_error(['message' => __('Please enter a search query.', 'liza-spotify')]);
+        // Validate and sanitize input
+        if (!isset($_POST['query']) || empty($_POST['query'])) {
+            wp_send_json_error(['message' => esc_html__('Please enter a search query.', 'liza-spotify-widget-for-elementor')]);
             return;
         }
 
-        $client = new Client();
-        $results = $client->search($query, $type, $limit);
+        $query = sanitize_text_field(wp_unslash($_POST['query']));
+        $type = isset($_POST['type']) ? sanitize_text_field(wp_unslash($_POST['type'])) : 'track,artist,album,playlist';
+        $limit = isset($_POST['limit']) ? intval(wp_unslash($_POST['limit'])) : 5;
 
-        if (!$results) {
-            wp_send_json_error(['message' => __('Failed to search Spotify.', 'liza-spotify')]);
-            return;
+        try {
+            $client = new Client();
+            $results = $client->search($query, $type, $limit);
+            wp_send_json_success($results);
+        } catch (\Exception $e) {
+            wp_send_json_error(['message' => esc_html__('Failed to search Spotify.', 'liza-spotify-widget-for-elementor')]);
         }
-
-        wp_send_json_success($results);
     }
 } 

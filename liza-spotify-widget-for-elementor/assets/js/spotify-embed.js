@@ -1,9 +1,14 @@
 jQuery(document).ready(function($) {
     let searchTimeout;
     let spotifyToken = '';
+    let isSearching = false;
 
     // Get Spotify token using client credentials flow
     function getSpotifyToken() {
+        console.log('Getting Spotify token...');
+        console.log('Client ID:', spotifyConfig.clientId);
+        console.log('Client Secret exists:', !!spotifyConfig.clientSecret);
+
         return $.ajax({
             url: 'https://accounts.spotify.com/api/token',
             type: 'POST',
@@ -14,31 +19,55 @@ jQuery(document).ready(function($) {
                 'grant_type': 'client_credentials'
             }
         }).then(function(data) {
+            console.log('Token received successfully');
             spotifyToken = data.access_token;
+            return spotifyToken;
+        }).catch(function(error) {
+            console.error('Failed to get Spotify token:', error);
+            throw new Error('Authentication failed');
         });
     }
 
     function initializeSearch() {
+        console.log('Initializing search...');
+        
         // Get a new token before initializing search
         getSpotifyToken().then(function() {
-            const searchField = $('.spotify-search-field');
-            const searchButton = $('.spotify-search-button');
-            const searchResults = $('.spotify-search-results');
+            console.log('Token obtained, setting up search handlers');
+            
+            const searchField = $('.elementor-control-search_field input');
+            const searchResults = $('.elementor-control-search_results .spotify-search-results');
             const searchType = $('.elementor-control-search_type select');
 
+            console.log('Search elements found:', {
+                searchField: searchField.length > 0,
+                searchResults: searchResults.length > 0,
+                searchType: searchType.length > 0
+            });
+
             function performSearch() {
+                if (isSearching) {
+                    console.log('Search already in progress, skipping');
+                    return;
+                }
+
                 const query = searchField.val().trim();
                 const type = searchType.val();
+
+                console.log('Performing search:', { query, type });
 
                 if (!query) {
                     searchResults.empty();
                     return;
                 }
 
+                isSearching = true;
+                searchField.prop('disabled', true);
                 searchResults.html('<div class="spotify-search-loading">' + spotifyConfig.i18n.searching + '</div>');
 
                 // Construct the Spotify Web API search URL
                 const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${type}&limit=5`;
+                console.log('Search URL:', searchUrl);
 
                 // Make the request to Spotify Web API
                 $.ajax({
@@ -48,23 +77,34 @@ jQuery(document).ready(function($) {
                         'Authorization': 'Bearer ' + spotifyToken
                     },
                     success: function(data) {
+                        console.log('Search results received:', data);
                         displaySearchResults(data, type);
                     },
                     error: function(xhr) {
+                        console.error('Search failed:', xhr);
                         if (xhr.status === 401) {
                             // Token expired, get a new one and retry
-                            getSpotifyToken().then(performSearch);
+                            console.log('Token expired, getting new token');
+                            getSpotifyToken().then(performSearch).catch(function() {
+                                searchResults.html('<div class="spotify-search-error">' + spotifyConfig.i18n.error + '</div>');
+                            });
                         } else {
                             searchResults.html('<div class="spotify-search-error">' + spotifyConfig.i18n.error + '</div>');
                         }
+                    },
+                    complete: function() {
+                        isSearching = false;
+                        searchField.prop('disabled', false);
                     }
                 });
             }
 
             function displaySearchResults(data, type) {
+                console.log('Displaying results for type:', type);
                 const items = data[type + 's'].items;
                 
                 if (!items.length) {
+                    console.log('No results found');
                     searchResults.html('<div class="spotify-search-no-results">' + spotifyConfig.i18n.noResults + '</div>');
                     return;
                 }
@@ -102,6 +142,8 @@ jQuery(document).ready(function($) {
                     const spotifyUrl = $(this).data('url');
                     const urlInput = $('.elementor-control-spotify_url input');
                     
+                    console.log('Selected item:', spotifyUrl);
+                    
                     // Update the hidden URL control
                     urlInput.val(spotifyUrl).trigger('input');
                     
@@ -116,32 +158,39 @@ jQuery(document).ready(function($) {
 
             // Handle search input with debounce
             searchField.on('input', function() {
+                console.log('Search input changed');
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(performSearch, 500);
             });
 
-            // Handle search button click
-            searchButton.on('click', performSearch);
-
             // Handle enter key
             searchField.on('keypress', function(e) {
                 if (e.which === 13) {
+                    console.log('Enter key pressed');
                     e.preventDefault();
+                    clearTimeout(searchTimeout);
                     performSearch();
                 }
             });
 
             // Handle content type change
             searchType.on('change', function() {
+                console.log('Content type changed:', $(this).val());
                 if (searchField.val().trim()) {
+                    clearTimeout(searchTimeout);
                     performSearch();
                 }
             });
+        }).catch(function(error) {
+            console.error('Failed to initialize search:', error);
+            const searchResults = $('.elementor-control-search_results .spotify-search-results');
+            searchResults.html('<div class="spotify-search-error">' + spotifyConfig.i18n.error + '</div>');
         });
     }
 
     // Initialize search when editor panel is opened for this widget
     elementor.hooks.addAction('panel/open_editor/widget/spotify-embed', function() {
+        console.log('Widget panel opened');
         setTimeout(initializeSearch, 100);
     });
 }); 

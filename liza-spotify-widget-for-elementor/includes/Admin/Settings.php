@@ -1,138 +1,134 @@
 <?php
-namespace LizaSpotify\Admin;
+namespace LizaSpotifyWidget\Admin;
 
 class Settings {
     private $spotify_client;
-    private $fs;
+    private $menu_slug = 'lizaspotifywidget-settings';
 
     public function __construct() {
-        // Initialize Freemius
-        if (!function_exists('liza_spotify_fs')) {
-            return;
-        }
-        
-        $this->fs = liza_spotify_fs();
-        
-        // Register menu with lower priority to ensure it runs after Freemius
-        add_action('admin_menu', [$this, 'add_plugin_page'], 99);
-        add_action('admin_init', [$this, 'page_init']);
-        
-        // Handle Spotify OAuth callback and disconnection
-        add_action('admin_init', [$this, 'handle_spotify_callback']);
-        add_action('admin_init', [$this, 'handle_spotify_disconnect']);
+        // Register menu with a lower priority to avoid conflicts
+        add_action('admin_menu', [$this, 'add_admin_menu'], 20);
+        add_action('admin_init', [$this, 'register_settings']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
         
         // Add dashboard widget
         add_action('wp_dashboard_setup', [$this, 'add_dashboard_widget']);
         
-        add_action('wp_ajax_dismiss_ruthless_promo', [$this, 'dismiss_promo']);
-        
-        $this->spotify_client = new \LizaSpotify\SpotifyAPI\Client();
+        try {
+            $this->spotify_client = new \LizaSpotifyWidget\SpotifyAPI\Client();
+        } catch (\Exception $e) {
+            add_action('admin_notices', function() use ($e) {
+                printf(
+                    '<div class="notice notice-error is-dismissible"><p>%s</p></div>',
+                    /* translators: %s: Error message from Spotify client */
+                    esc_html(sprintf(__('Spotify Client Error: %s', 'liza-spotify-widget-for-elementor'), $e->getMessage()))
+                );
+            });
+        }
     }
 
-    public function add_plugin_page() {
+    public function add_admin_menu() {
+        // Check if menu already exists to prevent duplicates
+        global $menu;
+        foreach ($menu as $item) {
+            if (isset($item[2]) && $item[2] === $this->menu_slug) {
+                return;
+            }
+        }
+
         add_menu_page(
-            __('Liza Spotify', 'liza-spotify'),
-            __('Liza Spotify', 'liza-spotify'),
+            esc_html__('Liza Spotify', 'liza-spotify-widget-for-elementor'),
+            esc_html__('Liza Spotify', 'liza-spotify-widget-for-elementor'),
             'manage_options',
-            'liza-spotify-settings',
-            [$this, 'create_admin_page'],
+            $this->menu_slug,
+            [$this, 'render_settings_page'],
             'dashicons-spotify',
             30
         );
 
         add_submenu_page(
-            'liza-spotify-settings',
-            __('Settings', 'liza-spotify'),
-            __('Settings', 'liza-spotify'),
+            $this->menu_slug,
+            esc_html__('Settings', 'liza-spotify-widget-for-elementor'),
+            esc_html__('Settings', 'liza-spotify-widget-for-elementor'),
             'manage_options',
-            'liza-spotify-settings',
-            [$this, 'create_admin_page']
+            $this->menu_slug,
+            [$this, 'render_settings_page']
         );
     }
 
-    public function create_admin_page() {
+    public function render_settings_page() {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions to access this page.'));
+            wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'liza-spotify-widget-for-elementor'));
         }
         
         // Show admin notices
-        settings_errors('liza_spotify_messages');
+        settings_errors('lizaspotifywidget_messages');
 
         $profile = null;
-        if (get_option('liza_spotify_access_token')) {
-            $profile = $this->spotify_client->get_user_profile();
+        if (get_option('lizaspotifywidget_access_token')) {
+            try {
+                $profile = $this->spotify_client->get_user_profile();
+            } catch (\Exception $e) {
+                add_settings_error(
+                    'lizaspotifywidget_messages',
+                    'spotify_error',
+                    esc_html__('Error fetching Spotify profile. Please try reconnecting.', 'liza-spotify-widget-for-elementor'),
+                    'error'
+                );
+            }
         }
+
+        // Check if we have valid credentials
+        $client_id = get_option('lizaspotifywidget_client_id');
+        $client_secret = get_option('lizaspotifywidget_client_secret');
+        $access_token = get_option('lizaspotifywidget_access_token');
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-
-            <?php if ($this->fs && !$this->fs->is_paying()): ?>
-                <div class="notice notice-info is-dismissible" style="padding: 20px; border-left-color: #2271b1;">
-                    <h3 style="margin-top: 0;"><?php _e('Upgrade to Pro Version', 'liza-spotify'); ?></h3>
-                    <p><?php _e('Get access to premium features:', 'liza-spotify'); ?></p>
-                    <ul style="list-style-type: disc; margin-left: 20px;">
-                        <li><?php _e('Now Playing Widget - Display currently playing track', 'liza-spotify'); ?></li>
-                        <li><?php _e('Artist Widget - Show artist profiles with stats', 'liza-spotify'); ?></li>
-                        <li><?php _e('Apple Music Integration - Embed Apple Music content', 'liza-spotify'); ?></li>
-                        <li><?php _e('Priority Support', 'liza-spotify'); ?></li>
-                    </ul>
-                    <p>
-                        <a href="<?php echo esc_url($this->fs->get_upgrade_url()); ?>" class="button button-primary">
-                            <?php _e('Upgrade Now', 'liza-spotify'); ?>
-                        </a>
-                    </p>
+            
+            <?php if (empty($client_id) || empty($client_secret)): ?>
+                <div class="notice notice-warning">
+                    <p><?php esc_html_e('Please enter your Spotify API credentials below.', 'liza-spotify-widget-for-elementor'); ?></p>
                 </div>
             <?php endif; ?>
 
             <form method="post" action="options.php">
                 <?php
-                settings_fields('liza_spotify_options');
-                do_settings_sections('liza-spotify-settings');
+                settings_fields('lizaspotifywidget_options');
+                do_settings_sections($this->menu_slug);
                 submit_button();
                 ?>
             </form>
 
-            <div class="spotify-auth-section" style="margin-top: 30px;">
-                <h2><?php _e('Spotify Authentication', 'liza-spotify'); ?></h2>
-                <?php if ($profile): ?>
-                    <div class="spotify-profile" style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin-top: 15px; text-align: center;">
-                        <?php if (!empty($profile['images'][0]['url'])): ?>
-                            <img src="<?php echo esc_url($profile['images'][0]['url']); ?>" 
-                                 alt="<?php echo esc_attr($profile['display_name']); ?>"
-                                 style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 10px;">
-                        <?php endif; ?>
-                        <p><?php printf(__('Connected as: %s', 'liza-spotify'), esc_html($profile['display_name'])); ?></p>
-                        <p><?php printf(__('Email: %s', 'liza-spotify'), esc_html($profile['email'])); ?></p>
-                        <p>
-                            <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=liza-spotify-settings&disconnect=1'), 'spotify_disconnect')); ?>" 
-                               class="button" 
-                               onclick="return confirm('<?php esc_attr_e('Are you sure you want to disconnect your Spotify account?', 'liza-spotify'); ?>');">
-                                <?php _e('Disconnect', 'liza-spotify'); ?>
-                            </a>
-                        </p>
-                    </div>
-                <?php else: ?>
-                    <div class="spotify-profile not-connected" style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin-top: 15px; text-align: center; border-left: 4px solid #dc3232;">
-                        <p><?php _e('No Spotify account connected.', 'liza-spotify'); ?></p>
-                        <p>
-                            <a href="<?php echo esc_url($this->spotify_client->get_auth_url()); ?>" 
-                               class="button button-primary">
-                                <?php _e('Connect with Spotify', 'liza-spotify'); ?>
-                            </a>
-                        </p>
-                    </div>
-                <?php endif; ?>
-            </div>
+            <?php if (!empty($client_id) && !empty($client_secret)): ?>
+                <div class="spotify-connection-section" style="margin-top: 30px;">
+                    <h2><?php esc_html_e('Spotify Connection', 'liza-spotify-widget-for-elementor'); ?></h2>
+                    
+                    <?php if ($access_token): ?>
+                        <p><?php esc_html_e('Connected to Spotify.', 'liza-spotify-widget-for-elementor'); ?></p>
+                        <form method="post" action="">
+                            <?php wp_nonce_field('disconnect_spotify', 'spotify_disconnect_nonce'); ?>
+                            <input type="hidden" name="action" value="disconnect_spotify">
+                            <?php submit_button(__('Disconnect Spotify', 'liza-spotify-widget-for-elementor'), 'secondary'); ?>
+                        </form>
+                    <?php else: ?>
+                        <p><?php esc_html_e('Not connected to Spotify.', 'liza-spotify-widget-for-elementor'); ?></p>
+                        <a href="<?php echo esc_url($this->spotify_client->get_auth_url()); ?>" class="button button-primary">
+                            <?php esc_html_e('Connect to Spotify', 'liza-spotify-widget-for-elementor'); ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
 
             <div class="tutorials-section" style="margin-top: 30px;">
-                <h2><?php _e('Video Tutorials', 'liza-spotify'); ?></h2>
+                <h2><?php esc_html_e('Video Tutorials', 'liza-spotify-widget-for-elementor'); ?></h2>
                 <div class="tutorials-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 15px;">
                     <div class="tutorial-card" style="background: #f9f9f9; padding: 20px; border-radius: 5px; border-left: 4px solid #1DB954;">
-                        <h3 style="margin-top: 0;"><?php _e('Getting Started with Liza Spotify', 'liza-spotify'); ?></h3>
-                        <p><?php _e('Learn how to set up and use the Liza Spotify plugin for WordPress.', 'liza-spotify'); ?></p>
-                        <a href="https://www.youtube.com/watch?v=HbL8ERGBquk" target="_blank" class="button button-primary">
+                        <h3 style="margin-top: 0;"><?php esc_html_e('Getting Started with Liza Spotify', 'liza-spotify-widget-for-elementor'); ?></h3>
+                        <p><?php esc_html_e('Learn how to set up and use the Liza Spotify plugin for WordPress.', 'liza-spotify-widget-for-elementor'); ?></p>
+                        <a href="<?php echo esc_url('https://www.youtube.com/watch?v=HbL8ERGBquk'); ?>" target="_blank" class="button button-primary">
                             <span class="dashicons dashicons-video-alt3" style="vertical-align: middle; margin-right: 5px;"></span>
-                            <?php _e('Watch Tutorial', 'liza-spotify'); ?>
+                            <?php esc_html_e('Watch Tutorial', 'liza-spotify-widget-for-elementor'); ?>
                         </a>
                     </div>
                 </div>
@@ -141,11 +137,11 @@ class Settings {
         <?php
     }
 
-    public function page_init() {
+    public function register_settings() {
         // Register settings
         register_setting(
-            'liza_spotify_options',
-            'liza_spotify_client_id',
+            'lizaspotifywidget_options',
+            'lizaspotifywidget_client_id',
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
@@ -154,8 +150,8 @@ class Settings {
         );
 
         register_setting(
-            'liza_spotify_options',
-            'liza_spotify_client_secret',
+            'lizaspotifywidget_options',
+            'lizaspotifywidget_client_secret',
             array(
                 'type' => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
@@ -165,188 +161,194 @@ class Settings {
 
         // Add settings section
         add_settings_section(
-            'liza_spotify_setting_section',
-            __('Spotify API Settings', 'liza-spotify'),
+            'lizaspotifywidget_setting_section',
+            esc_html__('Spotify API Settings', 'liza-spotify-widget-for-elementor'),
             [$this, 'section_info'],
-            'liza-spotify-settings'
+            $this->menu_slug
         );
 
         // Add settings fields
         add_settings_field(
-            'liza_spotify_client_id',
-            __('Client ID', 'liza-spotify'),
+            'lizaspotifywidget_client_id',
+            esc_html__('Client ID', 'liza-spotify-widget-for-elementor'),
             [$this, 'client_id_callback'],
-            'liza-spotify-settings',
-            'liza_spotify_setting_section'
+            $this->menu_slug,
+            'lizaspotifywidget_setting_section'
         );
 
         add_settings_field(
-            'liza_spotify_client_secret',
-            __('Client Secret', 'liza-spotify'),
+            'lizaspotifywidget_client_secret',
+            esc_html__('Client Secret', 'liza-spotify-widget-for-elementor'),
             [$this, 'client_secret_callback'],
-            'liza-spotify-settings',
-            'liza_spotify_setting_section'
+            $this->menu_slug,
+            'lizaspotifywidget_setting_section'
         );
+
+        // Handle disconnect action
+        if (isset($_POST['action']) && $_POST['action'] === 'disconnect_spotify' && 
+            isset($_POST['spotify_disconnect_nonce'])) {
+            
+            $nonce = sanitize_text_field(wp_unslash($_POST['spotify_disconnect_nonce']));
+            
+            if (wp_verify_nonce($nonce, 'disconnect_spotify')) {
+                delete_option('lizaspotifywidget_access_token');
+                delete_option('lizaspotifywidget_refresh_token');
+                delete_option('lizaspotifywidget_token_expiry');
+                
+                wp_redirect(add_query_arg('disconnected', '1', admin_url('admin.php?page=' . $this->menu_slug)));
+                exit;
+            }
+        }
     }
 
     public function section_info() {
-        echo '<p>' . esc_html__('Enter your Spotify API credentials below. You can get these by creating an application in the Spotify Developer Dashboard.', 'liza-spotify') . '</p>';
+        echo '<p>' . esc_html__('Enter your Spotify API credentials below. You can get these by creating an application in the Spotify Developer Dashboard.', 'liza-spotify-widget-for-elementor') . '</p>';
+        echo '<p><a href="https://developer.spotify.com/dashboard" target="_blank">' . esc_html__('Go to Spotify Developer Dashboard', 'liza-spotify-widget-for-elementor') . '</a></p>';
     }
 
     public function client_id_callback() {
-        $value = get_option('liza_spotify_client_id');
+        $value = get_option('lizaspotifywidget_client_id');
         ?>
         <input type="text" 
-               id="liza_spotify_client_id" 
-               name="liza_spotify_client_id" 
+               id="lizaspotifywidget_client_id" 
+               name="lizaspotifywidget_client_id" 
                value="<?php echo esc_attr($value); ?>" 
                class="regular-text" />
         <?php
     }
 
     public function client_secret_callback() {
-        $value = get_option('liza_spotify_client_secret');
+        $value = get_option('lizaspotifywidget_client_secret');
         ?>
         <input type="password" 
-               id="liza_spotify_client_secret" 
-               name="liza_spotify_client_secret" 
+               id="lizaspotifywidget_client_secret" 
+               name="lizaspotifywidget_client_secret" 
                value="<?php echo esc_attr($value); ?>" 
                class="regular-text" />
         <?php
     }
 
-    public function handle_spotify_callback() {
+    public function handle_connect() {
         if (!isset($_GET['code']) || !isset($_GET['state'])) {
-            return;
+            wp_die(esc_html__('Invalid authentication request', 'liza-spotify-widget-for-elementor'));
         }
 
-        if (!wp_verify_nonce($_GET['state'], 'spotify_auth')) {
-            wp_die(__('Invalid authentication request', 'liza-spotify'));
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['state'])), 'spotify_auth')) {
+            wp_die(esc_html__('Invalid authentication request', 'liza-spotify-widget-for-elementor'));
         }
 
-        $success = $this->spotify_client->handle_auth_callback($_GET['code']);
+        try {
+            $success = $this->spotify_client->handle_auth_callback(sanitize_text_field(wp_unslash($_GET['code'])));
 
-        if ($success) {
+            if ($success) {
+                add_settings_error(
+                    'lizaspotifywidget_messages',
+                    'spotify_connected',
+                    esc_html__('Successfully connected to Spotify!', 'liza-spotify-widget-for-elementor'),
+                    'success'
+                );
+            } else {
+                throw new \Exception(__('Failed to connect to Spotify', 'liza-spotify-widget-for-elementor'));
+            }
+        } catch (\Exception $e) {
             add_settings_error(
-                'liza_spotify_messages',
-                'spotify_connected',
-                __('Successfully connected to Spotify!', 'liza-spotify'),
-                'success'
-            );
-        } else {
-            add_settings_error(
-                'liza_spotify_messages',
+                'lizaspotifywidget_messages',
                 'spotify_error',
-                __('Failed to connect to Spotify. Please try again.', 'liza-spotify'),
+                esc_html__('Failed to connect to Spotify. Please try again.', 'liza-spotify-widget-for-elementor'),
                 'error'
             );
         }
     }
 
-    public function handle_spotify_disconnect() {
+    public function handle_disconnect() {
         if (!isset($_GET['disconnect']) || !isset($_GET['_wpnonce'])) {
-            return;
+            wp_die(esc_html__('Invalid disconnect request', 'liza-spotify-widget-for-elementor'));
         }
 
-        if (!wp_verify_nonce($_GET['_wpnonce'], 'spotify_disconnect')) {
-            wp_die(__('Invalid disconnect request', 'liza-spotify'));
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'spotify_disconnect')) {
+            wp_die(esc_html__('Invalid disconnect request', 'liza-spotify-widget-for-elementor'));
         }
 
         // Clear all Spotify-related tokens and data
-        delete_option('liza_spotify_access_token');
-        delete_option('liza_spotify_refresh_token');
-        delete_option('liza_spotify_token_expiry');
+        delete_option('lizaspotifywidget_access_token');
+        delete_option('lizaspotifywidget_refresh_token');
+        delete_option('lizaspotifywidget_token_expiry');
 
         // Add success message
         add_settings_error(
-            'liza_spotify_messages',
+            'lizaspotifywidget_messages',
             'spotify_disconnected',
-            __('Successfully disconnected from Spotify.', 'liza-spotify'),
+            esc_html__('Successfully disconnected from Spotify.', 'liza-spotify-widget-for-elementor'),
             'success'
         );
 
         // Redirect to remove the disconnect parameters from URL
-        wp_redirect(admin_url('admin.php?page=liza-spotify-settings'));
+        wp_redirect(admin_url('admin.php?page=' . $this->menu_slug));
         exit;
     }
 
     public function add_dashboard_widget() {
-        // Add custom HTML to widget title
-        $widget_title = sprintf(
-            '%s <a href="#" class="page-title-action pro-btn" style="margin-left: 10px; background: #1DB954; color: #fff; border-color: #1aa549; font-weight: 500; text-decoration: none; font-size: 12px; padding: 3px 8px; border-radius: 2px;">%s <span class="dashicons dashicons-star-filled" style="font-size: 12px; width: 12px; height: 12px; margin-left: 4px; vertical-align: text-bottom;"></span></a>',
-            __('Spotify Connection Status', 'liza-spotify'),
-            __('Go Pro', 'liza-spotify')
-        );
-
         wp_add_dashboard_widget(
-            'liza_spotify_dashboard_widget',
-            $widget_title,
+            'lizaspotifywidget_dashboard_widget',
+            esc_html__('Liza Spotify Status', 'liza-spotify-widget-for-elementor'),
             [$this, 'render_dashboard_widget']
         );
     }
 
     public function render_dashboard_widget() {
-        $profile = null;
-        if (get_option('liza_spotify_access_token')) {
-            $profile = $this->spotify_client->get_user_profile();
-        }
-
-        if ($profile) {
-            echo '<div class="spotify-dashboard-status connected">';
-            if (!empty($profile['images'][0]['url'])) {
-                echo '<img src="' . esc_url($profile['images'][0]['url']) . '" 
-                           alt="' . esc_attr($profile['display_name']) . '"
-                           style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px; vertical-align: middle;">';
+        if (get_option('lizaspotifywidget_access_token')) {
+            try {
+                $profile = $this->spotify_client->get_user_profile();
+                ?>
+                <p><?php esc_html_e('Connected to Spotify as:', 'liza-spotify-widget-for-elementor'); ?></p>
+                <p><strong><?php echo esc_html($profile['display_name']); ?></strong></p>
+                <p>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=' . $this->menu_slug)); ?>" class="button button-secondary">
+                        <?php esc_html_e('Manage Settings', 'liza-spotify-widget-for-elementor'); ?>
+                    </a>
+                </p>
+                <?php
+            } catch (\Exception $e) {
+                ?>
+                <p><?php esc_html_e('Error connecting to Spotify. Please try reconnecting.', 'liza-spotify-widget-for-elementor'); ?></p>
+                <p>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=' . $this->menu_slug)); ?>" class="button button-primary">
+                        <?php esc_html_e('Reconnect Spotify', 'liza-spotify-widget-for-elementor'); ?>
+                    </a>
+                </p>
+                <?php
             }
-            echo '<strong>' . sprintf(__('Connected as: %s', 'liza-spotify'), esc_html($profile['display_name'])) . '</strong>';
-            echo '<p><a href="' . esc_url(admin_url('admin.php?page=liza-spotify-settings')) . '" class="button button-secondary">' . 
-                 __('Manage Settings', 'liza-spotify') . '</a></p>';
-            echo '</div>';
         } else {
-            echo '<div class="spotify-dashboard-status not-connected">';
-            echo '<p>' . __('Not connected to Spotify', 'liza-spotify') . '</p>';
-            echo '<p><a href="' . esc_url(admin_url('admin.php?page=liza-spotify-settings')) . '" class="button button-primary">' . 
-                 __('Connect Spotify Account', 'liza-spotify') . '</a></p>';
-            echo '</div>';
+            ?>
+            <p><?php esc_html_e('No Spotify account connected.', 'liza-spotify-widget-for-elementor'); ?></p>
+            <p>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=' . $this->menu_slug)); ?>" class="button button-primary">
+                    <?php esc_html_e('Connect Spotify', 'liza-spotify-widget-for-elementor'); ?>
+                </a>
+            </p>
+            <?php
         }
-
-        ?>
-        <style>
-            .spotify-dashboard-status {
-                padding: 15px;
-                background: #fff;
-                border-left: 4px solid #ccc;
-                margin-bottom: 10px;
-            }
-            .spotify-dashboard-status.connected {
-                border-left-color: #46b450;
-            }
-            .spotify-dashboard-status.not-connected {
-                border-left-color: #dc3232;
-            }
-            .spotify-dashboard-status img {
-                display: inline-block;
-            }
-            .spotify-dashboard-status strong {
-                display: inline-block;
-                margin-bottom: 10px;
-            }
-            #liza_spotify_dashboard_widget .pro-btn:hover {
-                background: #1ed760 !important;
-                border-color: #1aa549 !important;
-                color: #fff !important;
-            }
-            #liza_spotify_dashboard_widget .pro-btn:focus {
-                box-shadow: 0 0 0 1px #fff, 0 0 0 3px #1DB954 !important;
-                color: #fff !important;
-            }
-        </style>
-        <?php
     }
 
-    public function dismiss_promo() {
-        check_ajax_referer('dismiss_ruthless_promo', 'nonce');
-        update_user_meta(get_current_user_id(), 'ruthless_promo_dismissed', time());
-        wp_send_json_success();
+    public function enqueue_scripts($hook) {
+        // Only load on our plugin's settings page
+        if ($hook !== 'toplevel_page_' . $this->menu_slug) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'lizaspotifywidget-admin',
+            plugin_dir_url(dirname(dirname(__FILE__))) . 'assets/css/admin.css',
+            [],
+            LIZASPOTIFYWIDGET_VERSION
+        );
+
+        wp_enqueue_script(
+            'lizaspotifywidget-admin',
+            plugin_dir_url(dirname(dirname(__FILE__))) . 'assets/js/admin.js',
+            ['jquery'],
+            LIZASPOTIFYWIDGET_VERSION,
+            true
+        );
     }
 } 
