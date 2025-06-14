@@ -14,7 +14,7 @@ class AppleMusicEmbed extends Widget_Base {
     }
 
     public function get_title() {
-        return __('Apple Music Embed (Pro)', 'liza-spotify');
+        return __('Apple Music Embed (Pro)', 'liza-spotify-widget-for-elementor');
     }
 
     public function get_icon() {
@@ -35,7 +35,7 @@ class AppleMusicEmbed extends Widget_Base {
         $this->start_controls_section(
             'content_section',
             [
-                'label' => __('Content', 'liza-spotify'),
+                'label' => __('Content', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_CONTENT,
             ]
         );
@@ -47,8 +47,8 @@ class AppleMusicEmbed extends Widget_Base {
                     'type' => Controls_Manager::RAW_HTML,
                     'raw' => sprintf(
                         /* translators: %s: Premium version upgrade link */
-                        __('This is a premium feature. Please %s to use Apple Music Embed widget.', 'liza-spotify'),
-                        '<a href="' . $liza_spotify_fs->get_upgrade_url() . '">' . __('upgrade to premium', 'liza-spotify') . '</a>'
+                        __('This is a premium feature. Please %s to use Apple Music Embed widget.', 'liza-spotify-widget-for-elementor'),
+                        '<a href="' . $liza_spotify_fs->get_upgrade_url() . '">' . __('upgrade to premium', 'liza-spotify-widget-for-elementor') . '</a>'
                     ),
                     'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
                 ]
@@ -59,22 +59,22 @@ class AppleMusicEmbed extends Widget_Base {
         $this->add_control(
             'apple_music_url',
             [
-                'label' => __('Apple Music URL', 'liza-spotify'),
+                'label' => __('Apple Music URL', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::TEXT,
                 'placeholder' => 'https://music.apple.com/us/album/...',
-                'description' => __('Enter the URL of an Apple Music song, album, playlist, artist, or episode.', 'liza-spotify'),
+                'description' => __('Enter the URL of an Apple Music song, album, playlist, artist, or episode.', 'liza-spotify-widget-for-elementor'),
             ]
         );
 
         $this->add_control(
             'theme',
             [
-                'label' => __('Theme', 'liza-spotify'),
+                'label' => __('Theme', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SELECT,
                 'default' => 'light',
                 'options' => [
-                    'light' => __('Light', 'liza-spotify'),
-                    'dark' => __('Dark', 'liza-spotify'),
+                    'light' => __('Light', 'liza-spotify-widget-for-elementor'),
+                    'dark' => __('Dark', 'liza-spotify-widget-for-elementor'),
                 ],
             ]
         );
@@ -82,7 +82,7 @@ class AppleMusicEmbed extends Widget_Base {
         $this->add_control(
             'height',
             [
-                'label' => __('Height', 'liza-spotify'),
+                'label' => __('Height', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::NUMBER,
                 'default' => 450,
                 'min' => 100,
@@ -94,7 +94,7 @@ class AppleMusicEmbed extends Widget_Base {
         $this->add_responsive_control(
             'width',
             [
-                'label' => __('Width', 'liza-spotify'),
+                'label' => __('Width', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%'],
                 'range' => [
@@ -138,7 +138,7 @@ class AppleMusicEmbed extends Widget_Base {
 
         if (empty($url)) {
             echo '<div class="elementor-alert elementor-alert-warning">';
-            echo __('Please enter an Apple Music URL.', 'liza-spotify');
+            echo __('Please enter an Apple Music URL.', 'liza-spotify-widget-for-elementor');
             echo '</div>';
             return;
         }
@@ -190,12 +190,12 @@ class AppleMusicEmbed extends Widget_Base {
             echo '</div>';
         } else {
             echo '<div class="elementor-alert elementor-alert-warning">';
-            echo __('Invalid Apple Music URL. Please enter a valid URL for a song, album, playlist, or artist.', 'liza-spotify');
+            echo __('Invalid Apple Music URL. Please enter a valid URL for a song, album, playlist, or artist.', 'liza-spotify-widget-for-elementor');
             echo '</div>';
             
             // Add example URLs for users
             echo '<div class="elementor-alert elementor-alert-info">';
-            echo __('Example URLs:', 'liza-spotify');
+            echo __('Example URLs:', 'liza-spotify-widget-for-elementor');
             echo '<ul>';
             echo '<li>Album: https://music.apple.com/us/album/album-name/1234567890</li>';
             echo '<li>Song: https://music.apple.com/us/album/album-name/1234567890?i=1234567890</li>';

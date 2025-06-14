@@ -11,7 +11,7 @@ class SpotifyNowPlaying extends Widget_Base {
     }
 
     public function get_title() {
-        return __('Spotify Now Playing', 'liza-spotify');
+        return __('Spotify Now Playing', 'liza-spotify-widget-for-elementor');
     }
 
     public function get_icon() {
@@ -27,7 +27,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->start_controls_section(
             'section_content',
             [
-                'label' => __('Display Settings', 'liza-spotify'),
+                'label' => __('Display Settings', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_CONTENT,
             ]
         );
@@ -35,7 +35,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'show_artwork',
             [
-                'label' => __('Show Album Artwork', 'liza-spotify'),
+                'label' => __('Show Album Artwork', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SWITCHER,
                 'default' => 'yes',
             ]
@@ -44,7 +44,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'show_listen_now',
             [
-                'label' => __('Show Listen Now Button', 'liza-spotify'),
+                'label' => __('Show Listen Now Button', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SWITCHER,
                 'default' => 'yes',
             ]
@@ -53,7 +53,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'refresh_interval',
             [
-                'label' => __('Refresh Interval (seconds)', 'liza-spotify'),
+                'label' => __('Refresh Interval (seconds)', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::NUMBER,
                 'min' => 1,
                 'max' => 60,
@@ -67,7 +67,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->start_controls_section(
             'section_container_style',
             [
-                'label' => __('Container', 'liza-spotify'),
+                'label' => __('Container', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
@@ -75,7 +75,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'background_color',
             [
-                'label' => __('Background Color', 'liza-spotify'),
+                'label' => __('Background Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .spotify-now-playing' => 'background-color: {{VALUE}};',
@@ -87,7 +87,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'border_radius',
             [
-                'label' => __('Border Radius', 'liza-spotify'),
+                'label' => __('Border Radius', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%'],
                 'selectors' => [
@@ -107,7 +107,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'padding',
             [
-                'label' => __('Padding', 'liza-spotify'),
+                'label' => __('Padding', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', 'em', '%'],
                 'selectors' => [
@@ -130,7 +130,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->start_controls_section(
             'section_artwork_style',
             [
-                'label' => __('Album Artwork', 'liza-spotify'),
+                'label' => __('Album Artwork', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
                 'condition' => [
                     'show_artwork' => 'yes',
@@ -141,7 +141,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'artwork_size',
             [
-                'label' => __('Size', 'liza-spotify'),
+                'label' => __('Size', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px'],
                 'range' => [
@@ -164,7 +164,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'artwork_border_radius',
             [
-                'label' => __('Border Radius', 'liza-spotify'),
+                'label' => __('Border Radius', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%'],
                 'selectors' => [
@@ -187,7 +187,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->start_controls_section(
             'section_track_info_style',
             [
-                'label' => __('Track Information', 'liza-spotify'),
+                'label' => __('Track Information', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
@@ -196,7 +196,7 @@ class SpotifyNowPlaying extends Widget_Base {
             \Elementor\Group_Control_Typography::get_type(),
             [
                 'name' => 'track_name_typography',
-                'label' => __('Track Name Typography', 'liza-spotify'),
+                'label' => __('Track Name Typography', 'liza-spotify-widget-for-elementor'),
                 'selector' => '{{WRAPPER}} .track-name',
             ]
         );
@@ -204,7 +204,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'track_name_color',
             [
-                'label' => __('Track Name Color', 'liza-spotify'),
+                'label' => __('Track Name Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .track-name' => 'color: {{VALUE}};',
@@ -217,7 +217,7 @@ class SpotifyNowPlaying extends Widget_Base {
             \Elementor\Group_Control_Typography::get_type(),
             [
                 'name' => 'artist_typography',
-                'label' => __('Artist Typography', 'liza-spotify'),
+                'label' => __('Artist Typography', 'liza-spotify-widget-for-elementor'),
                 'selector' => '{{WRAPPER}} .track-artist',
             ]
         );
@@ -225,7 +225,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'artist_color',
             [
-                'label' => __('Artist Color', 'liza-spotify'),
+                'label' => __('Artist Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .track-artist' => 'color: {{VALUE}};',
@@ -238,7 +238,7 @@ class SpotifyNowPlaying extends Widget_Base {
             \Elementor\Group_Control_Typography::get_type(),
             [
                 'name' => 'album_typography',
-                'label' => __('Album Typography', 'liza-spotify'),
+                'label' => __('Album Typography', 'liza-spotify-widget-for-elementor'),
                 'selector' => '{{WRAPPER}} .track-album',
             ]
         );
@@ -246,7 +246,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'album_color',
             [
-                'label' => __('Album Color', 'liza-spotify'),
+                'label' => __('Album Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .track-album' => 'color: {{VALUE}};',
@@ -261,7 +261,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->start_controls_section(
             'section_progress_style',
             [
-                'label' => __('Progress Bar', 'liza-spotify'),
+                'label' => __('Progress Bar', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
@@ -269,7 +269,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'progress_height',
             [
-                'label' => __('Height', 'liza-spotify'),
+                'label' => __('Height', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px'],
                 'range' => [
@@ -292,7 +292,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'progress_background_color',
             [
-                'label' => __('Background Color', 'liza-spotify'),
+                'label' => __('Background Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .progress-bar' => 'background-color: {{VALUE}};',
@@ -304,7 +304,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'progress_color',
             [
-                'label' => __('Progress Color', 'liza-spotify'),
+                'label' => __('Progress Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .progress-bar .progress' => 'background-color: {{VALUE}};',
@@ -319,7 +319,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->start_controls_section(
             'section_button_style',
             [
-                'label' => __('Listen Now Button', 'liza-spotify'),
+                'label' => __('Listen Now Button', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
                 'condition' => [
                     'show_listen_now' => 'yes',
@@ -340,14 +340,14 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->start_controls_tab(
             'button_normal',
             [
-                'label' => __('Normal', 'liza-spotify'),
+                'label' => __('Normal', 'liza-spotify-widget-for-elementor'),
             ]
         );
 
         $this->add_control(
             'button_background_color',
             [
-                'label' => __('Background Color', 'liza-spotify'),
+                'label' => __('Background Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .listen-now' => 'background-color: {{VALUE}};',
@@ -359,7 +359,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'button_text_color',
             [
-                'label' => __('Text Color', 'liza-spotify'),
+                'label' => __('Text Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .listen-now' => 'color: {{VALUE}};',
@@ -373,14 +373,14 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->start_controls_tab(
             'button_hover',
             [
-                'label' => __('Hover', 'liza-spotify'),
+                'label' => __('Hover', 'liza-spotify-widget-for-elementor'),
             ]
         );
 
         $this->add_control(
             'button_background_color_hover',
             [
-                'label' => __('Background Color', 'liza-spotify'),
+                'label' => __('Background Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .listen-now:hover' => 'background-color: {{VALUE}};',
@@ -392,7 +392,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'button_text_color_hover',
             [
-                'label' => __('Text Color', 'liza-spotify'),
+                'label' => __('Text Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .listen-now:hover' => 'color: {{VALUE}};',
@@ -408,7 +408,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'button_border_radius',
             [
-                'label' => __('Border Radius', 'liza-spotify'),
+                'label' => __('Border Radius', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%'],
                 'selectors' => [
@@ -428,7 +428,7 @@ class SpotifyNowPlaying extends Widget_Base {
         $this->add_control(
             'button_padding',
             [
-                'label' => __('Padding', 'liza-spotify'),
+                'label' => __('Padding', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', 'em', '%'],
                 'selectors' => [
@@ -454,10 +454,10 @@ class SpotifyNowPlaying extends Widget_Base {
         if (!$liza_spotify_fs->can_use_premium_code()) {
             ?>
             <div class="spotify-widget-premium-notice">
-                <h3><?php _e('Premium Feature', 'liza-spotify'); ?></h3>
-                <p><?php _e('The Spotify Now Playing widget is only available in the premium version.', 'liza-spotify'); ?></p>
+                <h3><?php _e('Premium Feature', 'liza-spotify-widget-for-elementor'); ?></h3>
+                <p><?php _e('The Spotify Now Playing widget is only available in the premium version.', 'liza-spotify-widget-for-elementor'); ?></p>
                 <a href="<?php echo esc_url($liza_spotify_fs->get_upgrade_url()); ?>" class="button button-primary" target="_blank">
-                    <?php _e('Upgrade to Premium', 'liza-spotify'); ?>
+                    <?php _e('Upgrade to Premium', 'liza-spotify-widget-for-elementor'); ?>
                 </a>
             </div>
             <?php
@@ -474,7 +474,7 @@ class SpotifyNowPlaying extends Widget_Base {
             $this->render_track($current_track);
         } else {
             echo '<div class="no-track-playing">';
-            echo __('No track currently playing', 'liza-spotify');
+            echo __('No track currently playing', 'liza-spotify-widget-for-elementor');
             echo '</div>';
         }
 
@@ -515,7 +515,7 @@ class SpotifyNowPlaying extends Widget_Base {
                     <svg viewBox="0 0 24 24">
                         <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
                     </svg>
-                    <?php _e('Listen Now', 'liza-spotify'); ?>
+                    <?php _e('Listen Now', 'liza-spotify-widget-for-elementor'); ?>
                 </a>
                 <?php endif; ?>
             </div>
@@ -529,7 +529,7 @@ class SpotifyNowPlaying extends Widget_Base {
         jQuery(document).ready(function($) {
             function updateTrackInfo(widget, data) {
                 if (!data.item) {
-                    widget.html('<div class="no-track-playing"><?php echo esc_js(__('No track currently playing', 'liza-spotify')); ?></div>');
+                    widget.html('<div class="no-track-playing"><?php echo esc_js(__('No track currently playing', 'liza-spotify-widget-for-elementor')); ?></div>');
                     return;
                 }
 

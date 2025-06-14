@@ -11,7 +11,7 @@
  * Requires Plugins:  elementor
  * Plugin URI:        https://ruthlesswp.com/spotify
  * Description:       Spotify Widget For Elementor
- * Version:           2.7 
+ * Version:           3.0 
  * tested up to:      6.8
  * Requires at least: 5.2
  * Requires PHP:      7.0
@@ -26,328 +26,252 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Enable error reporting for debugging
-if (!function_exists('lizaspotifywidget_write_log')) {
-    function lizaspotifywidget_write_log($log) {
-        // Only log if both WP_DEBUG and WP_DEBUG_LOG are enabled
-        if (!defined('WP_DEBUG') || !WP_DEBUG || !defined('WP_DEBUG_LOG') || !WP_DEBUG_LOG) {
-            return;
-        }
+if (function_exists('liza_spotify_fs')) {
+    liza_spotify_fs()->set_basename(true, __FILE__);
+} else {
+    /**
+     * DO NOT REMOVE THIS IF, IT IS ESSENTIAL FOR THE
+     * `function_exists` CALL ABOVE TO PROPERLY WORK.
+     */
+    if (!function_exists('liza_spotify_fs')) {
+        // Create a helper function for easy SDK access.
+        function liza_spotify_fs() {
+            global $liza_spotify_fs;
 
-        // Format the log message
-        $message = is_array($log) || is_object($log) ? wp_json_encode($log) : $log;
-        
-        // Add timestamp and context using WordPress time functions
-        $message = '[' . current_time('mysql') . '] Liza Spotify Widget: ' . $message;
-        
-        // Use WordPress debug log function instead of error_log
-        if (function_exists('wp_debug_log')) {
-            wp_debug_log($message, 'lizaspotifywidget');
-        }
-    }
-}
+            if (!isset($liza_spotify_fs)) {
+                // Include Freemius SDK.
+                require_once dirname(__FILE__) . '/freemius/start.php';
 
-// Define plugin constants
-define('LIZASPOTIFYWIDGET_PATH', plugin_dir_path(__FILE__));
-define('LIZASPOTIFYWIDGET_URL', plugin_dir_url(__FILE__));
-define('LIZASPOTIFYWIDGET_VERSION', '2.4');
-
-// Autoloader with error handling
-spl_autoload_register(function ($class) {
-    try {
-        $prefix = 'LizaSpotifyWidget\\';
-        $base_dir = LIZASPOTIFYWIDGET_PATH . 'includes/';
-        $len = strlen($prefix);
-        
-        if (strncmp($prefix, $class, $len) !== 0) {
-            return;
-        }
-        
-        $relative_class = substr($class, $len);
-        $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
-        
-        if (file_exists($file)) {
-            require_once $file;
-        } else {
-            lizaspotifywidget_write_log('File not found: ' . $file);
-        }
-    } catch (Exception $e) {
-        lizaspotifywidget_write_log('Autoloader Error: ' . $e->getMessage());
-    }
-});
-
-// Handle Spotify OAuth callback
-add_action('admin_init', function() {
-    if (isset($_GET['page']) && $_GET['page'] === 'liza-spotify-settings' && isset($_GET['code'])) {
-        // Verify nonce
-        if (!isset($_GET['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'spotify_auth')) {
-            wp_die(esc_html__('Invalid authentication request', 'liza-spotify-widget-for-elementor'));
-        }
-
-        try {
-            $client = new \LizaSpotifyWidget\SpotifyAPI\Client();
-            $code = sanitize_text_field(wp_unslash($_GET['code']));
-            $success = $client->handle_auth_callback($code);
-            
-            if ($success) {
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-success is-dismissible"><p>' . 
-                         esc_html__('Successfully connected to Spotify!', 'liza-spotify-widget-for-elementor') . 
-                         '</p></div>';
-                });
-            } else {
-                add_action('admin_notices', function() {
-                    echo '<div class="notice notice-error is-dismissible"><p>' . 
-                         esc_html__('Failed to connect to Spotify. Please try again.', 'liza-spotify-widget-for-elementor') . 
-                         '</p></div>';
-                });
+                $liza_spotify_fs = fs_dynamic_init(array(
+                    'id'                  => '17621',
+                    'slug'               => 'liza-spotify-widget-for-elementor',
+                    'type'               => 'plugin',
+                    'public_key'         => 'pk_ab067d7d1f575920e999c45eda465',
+                    'is_premium'         => false,
+                    'has_premium_version' => true,
+                    'has_addons'         => false,
+                    'has_paid_plans'     => true,
+                    'premium_suffix'      => 'Pro',
+                    'menu' => array(
+                        'slug'           => 'liza-spotify-settings',
+                        'first-path'     => 'admin.php?page=liza-spotify-settings',
+                        'parent'         => array(
+                            'slug'       => 'liza-spotify-settings',
+                        ),
+                        'account'        => true,
+                        'contact'        => false,
+                        'support'        => true,
+                        'network'        => true,
+                        'pricing'        => true,
+                    ),
+                    'is_live'            => true,
+                    'trial'              => array(
+                        'days'               => 14,
+                        'is_require_payment' => false,
+                    ),
+                    'textdomain'         => 'liza-spotify-widget-for-elementor',
+                ));
             }
-        } catch (Exception $e) {
-            if (defined('WP_DEBUG') && WP_DEBUG === true) {
-                lizaspotifywidget_write_log('Spotify OAuth Error: ' . $e->getMessage());
-            }
-            add_action('admin_notices', function() use ($e) {
-                echo '<div class="notice notice-error is-dismissible"><p>' . 
-                     /* translators: %s: Error message from Spotify API */
-                     esc_html(sprintf(__('Spotify connection error: %s', 'liza-spotify-widget-for-elementor'), $e->getMessage())) . 
-                     '</p></div>';
-            });
-        }
-    }
-});
 
-// Initialize the plugin with error handling
-add_action('plugins_loaded', function () {
-    try {
-        // Check if Elementor is installed and activated
-        if (!did_action('elementor/loaded')) {
-            add_action('admin_notices', function() {
-                // Verify nonce for admin requests
-                if (isset($_GET['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'activate-plugin')) {
-                    if (isset($_GET['activate'])) {
-                        unset($_GET['activate']);
-                    }
-                    
-                    $message = sprintf(
-                        /* translators: 1: Plugin name, 2: Required plugin name */
-                        esc_html__('"%1$s" requires "%2$s" to be installed and activated.', 'liza-spotify-widget-for-elementor'),
-                        '<strong>' . esc_html__('Liza Spotify Widgets', 'liza-spotify-widget-for-elementor') . '</strong>',
-                        '<strong>' . esc_html__('Elementor', 'liza-spotify-widget-for-elementor') . '</strong>'
-                    );
-                    
-                    printf('<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', wp_kses_post($message));
+            return $liza_spotify_fs;
+        }
+
+        // Init Freemius.
+        liza_spotify_fs();
+        // Signal that SDK was initiated.
+        do_action('liza_spotify_fs_loaded');
+
+        define('LIZA_SPOTIFY_PATH', plugin_dir_path(__FILE__));
+        define('LIZA_SPOTIFY_URL', plugin_dir_url(__FILE__));
+        define('LIZA_SPOTIFY_VERSION', '2.0.0');
+
+        // Autoloader
+        spl_autoload_register(function ($class) {
+            $prefix = 'LizaSpotify\\';
+            $base_dir = LIZA_SPOTIFY_PATH . 'includes/';
+
+            $len = strlen($prefix);
+            if (strncmp($prefix, $class, $len) !== 0) {
+                return;
+            }
+
+            $relative_class = substr($class, $len);
+            $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+
+            if (file_exists($file)) {
+                require $file;
+            }
+        });
+
+        // Initialize the plugin
+        class LizaSpotify {
+            private static $instance = null;
+
+            public static function get_instance() {
+                if (null === self::$instance) {
+                    self::$instance = new self();
                 }
-            });
-            return;
+                return self::$instance;
+            }
+
+            private function __construct() {
+                add_action('plugins_loaded', [$this, 'init']);
+            }
+
+            public function init() {
+                // Check if Elementor is installed and activated
+                if (!did_action('elementor/loaded')) {
+                    add_action('admin_notices', [$this, 'elementor_missing_notice']);
+                    return;
+                }
+
+                // Load plugin components
+                $this->load_dependencies();
+                $this->setup_hooks();
+
+                // Initialize widgets
+                if (class_exists('\Elementor\Plugin')) {
+                    // Add Elementor widget category
+                    add_action('elementor/elements/categories_registered', [$this, 'add_elementor_widget_category']);
+                    
+                    // Initialize widget loader
+                    new \LizaSpotify\Widgets\WidgetLoader();
+                }
+            }
+
+            public function add_elementor_widget_category($elements_manager) {
+                $elements_manager->add_category(
+                    'liza-spotify',
+                    [
+                        'title' => __('Spotify Widgets', 'liza-spotify-widget-for-elementor'),
+                        'icon' => 'eicon-spotify',
+                    ]
+                );
+            }
+
+            public function elementor_missing_notice() {
+                if (isset($_GET['activate'])) {
+                    unset($_GET['activate']);
+                }
+
+                $message = sprintf(
+                    esc_html__('"%1$s" requires "%2$s" to be installed and activated.', 'liza-spotify-widget-for-elementor'),
+                    '<strong>' . esc_html__('Liza Spotify Widgets Pro', 'liza-spotify-widget-for-elementor') . '</strong>',
+                    '<strong>' . esc_html__('Elementor', 'liza-spotify-widget-for-elementor') . '</strong>'
+                );
+
+                printf('<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message);
+            }
+
+            private function load_dependencies() {
+                // Load required files
+                require_once LIZA_SPOTIFY_PATH . 'includes/Admin/Settings.php';
+                require_once LIZA_SPOTIFY_PATH . 'includes/SpotifyAPI/Client.php';
+                require_once LIZA_SPOTIFY_PATH . 'includes/Widgets/WidgetLoader.php';
+                require_once LIZA_SPOTIFY_PATH . 'includes/Ajax/NowPlaying.php';
+            }
+
+            private function setup_hooks() {
+                // Register activation and deactivation hooks
+                register_activation_hook(__FILE__, [$this, 'activate']);
+                register_deactivation_hook(__FILE__, [$this, 'deactivate']);
+
+                // Initialize admin settings
+                if (is_admin()) {
+                    new \LizaSpotify\Admin\Settings();
+                }
+
+                // Initialize AJAX handlers
+                new \LizaSpotify\Ajax\NowPlaying();
+
+                // Enqueue styles
+                add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
+                add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_styles']);
+            }
+
+            public function enqueue_styles() {
+                wp_enqueue_style(
+                    'liza-spotify-now-playing',
+                    LIZA_SPOTIFY_URL . 'assets/css/spotify-now-playing.css',
+                    [],
+                    LIZA_SPOTIFY_VERSION
+                );
+
+                wp_enqueue_style(
+                    'liza-spotify-artist',
+                    LIZA_SPOTIFY_URL . 'assets/css/spotify-artist.css',
+                    [],
+                    LIZA_SPOTIFY_VERSION
+                );
+            }
+
+            public function enqueue_admin_styles() {
+                wp_enqueue_style(
+                    'liza-spotify-admin',
+                    LIZA_SPOTIFY_URL . 'assets/css/admin.css',
+                    [],
+                    LIZA_SPOTIFY_VERSION
+                );
+            }
+
+            public function show_promo_banner() {
+                // Get the dismissal timestamp
+                $dismissed_time = get_user_meta(get_current_user_id(), 'ruthless_promo_dismissed', true);
+                
+                // If dismissed and 2 days haven't passed yet, don't show
+                if ($dismissed_time && (time() - $dismissed_time < 2 * DAY_IN_SECONDS)) {
+                    return;
+                }
+
+                ?>
+                <div class="notice ruthless-promo-notice is-dismissible">
+                    <div class="ruthless-promo-content">
+                        <span class="ruthless-promo-icon">🎨</span>
+                        <div class="ruthless-promo-text">
+                            <h3><?php _e('Enhance Your Elementor Website with Custom Fonts!', 'liza-spotify-widget-for-elementor'); ?></h3>
+                            <p><?php _e('Take your design to the next level with ', 'liza-spotify-widget-for-elementor'); ?>
+                            <a href="https://www.ruthlesswp.com/plugins/ruthless-custom-fonts-for-elementor" target="_blank">
+                                <?php _e('Ruthless Custom Fonts for Elementor', 'liza-spotify-widget-for-elementor'); ?>
+                            </a>
+                            <?php _e(' - Upload and use any custom font in your Elementor designs.', 'liza-spotify-widget-for-elementor'); ?></p>
+                        </div>
+                        <a href="https://www.ruthlesswp.com/plugins/ruthless-custom-fonts-for-elementor" class="button button-primary" target="_blank">
+                            <?php _e('Learn More', 'liza-spotify-widget-for-elementor'); ?>
+                        </a>
+                    </div>
+                </div>
+                <script>
+                jQuery(document).ready(function($) {
+                    $(document).on('click', '.ruthless-promo-notice .notice-dismiss', function() {
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'dismiss_ruthless_promo',
+                                nonce: '<?php echo wp_create_nonce('dismiss_ruthless_promo'); ?>'
+                            }
+                        });
+                    });
+                });
+                </script>
+                <?php
+            }
+
+            public function activate() {
+                // Create necessary database tables and options
+                add_option('liza_spotify_client_id', '');
+                add_option('liza_spotify_client_secret', '');
+                add_option('liza_spotify_access_token', '');
+                add_option('liza_spotify_refresh_token', '');
+                add_option('liza_spotify_token_expiry', '');
+            }
+
+            public function deactivate() {
+                // Cleanup if necessary
+            }
         }
 
         // Initialize the plugin
-        LizaSpotifyWidget::get_instance();
-    } catch (Exception $e) {
-        if (defined('WP_DEBUG') && WP_DEBUG === true) {
-            lizaspotifywidget_write_log('Liza Spotify Initialization Error: ' . $e->getMessage());
-        }
-        add_action('admin_notices', function() use ($e) {
-            printf(
-                '<div class="notice notice-error is-dismissible"><p>%s</p></div>',
-                /* translators: %s: Error message from plugin initialization */
-                esc_html(sprintf(__('Liza Spotify Widgets Error: %s', 'liza-spotify-widget-for-elementor'), $e->getMessage()))
-            );
-        });
+        LizaSpotify::get_instance();
     }
-}, 0);
-
-/**
- * Main plugin class
- */
-class LizaSpotifyWidget {
-    private static $instance = null;
-    private $settings = null;
-    private $widget_loader = null;
-
-    /**
-     * Get plugin instance
-     */
-    public static function get_instance() {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-    /**
-     * Constructor
-     */
-    private function __construct() {
-        try {
-            $this->init();
-        } catch (Exception $e) {
-            lizaspotifywidget_write_log('Constructor Error: ' . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    /**
-     * Initialize plugin
-     */
-    private function init() {
-        try {
-            // Load plugin components
-            $this->load_dependencies();
-            $this->setup_hooks();
-
-            // Initialize widgets
-            if (class_exists('\\Elementor\\Plugin')) {
-                add_action('elementor/elements/categories_registered', [$this, 'add_elementor_widget_category']);
-                $this->widget_loader = new \LizaSpotifyWidget\Widgets\WidgetLoader();
-            }
-        } catch (Exception $e) {
-            lizaspotifywidget_write_log('Init Error: ' . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    /**
-     * Add Elementor widget category
-     */
-    public function add_elementor_widget_category($elements_manager) {
-        try {
-            $elements_manager->add_category('lizaspotifywidget', [
-                'title' => esc_html__('Spotify Widgets', 'liza-spotify-widget-for-elementor'),
-                'icon'  => 'eicon-spotify',
-            ]);
-        } catch (Exception $e) {
-            lizaspotifywidget_write_log('Category Error: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Load plugin dependencies
-     */
-    private function load_dependencies() {
-        try {
-            $required_files = [
-                'includes/Admin/Settings.php',
-                'includes/SpotifyAPI/Client.php',
-                'includes/Widgets/WidgetLoader.php'
-            ];
-
-            foreach ($required_files as $file) {
-                $file_path = LIZASPOTIFYWIDGET_PATH . $file;
-                if (!file_exists($file_path)) {
-                    throw new Exception(sprintf(
-                        /* translators: %s: Path to the missing file */
-                        __('Required file not found: %s', 'liza-spotify-widget-for-elementor'),
-                        $file
-                    ));
-                }
-                require_once $file_path;
-            }
-
-            if (is_admin()) {
-                $this->settings = new \LizaSpotifyWidget\Admin\Settings();
-            }
-        } catch (Exception $e) {
-            lizaspotifywidget_write_log('Dependencies Error: ' . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    /**
-     * Setup plugin hooks
-     */
-    private function setup_hooks() {
-        try {
-            add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
-            add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_styles']);
-            add_action('elementor/editor/before_enqueue_scripts', [$this, 'enqueue_editor_scripts']);
-        } catch (Exception $e) {
-            lizaspotifywidget_write_log('Hooks Error: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Enqueue frontend styles
-     */
-    public function enqueue_styles() {
-        try {
-            wp_enqueue_style(
-                'liza-spotify-embed',
-                LIZASPOTIFYWIDGET_URL . 'assets/css/spotify-embed.css',
-                [],
-                LIZASPOTIFYWIDGET_VERSION
-            );
-        } catch (Exception $e) {
-            lizaspotifywidget_write_log('Styles Error: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Enqueue admin styles
-     */
-    public function enqueue_admin_styles() {
-        try {
-            wp_enqueue_style(
-                'liza-spotify-admin',
-                LIZASPOTIFYWIDGET_URL . 'assets/css/admin.css',
-                [],
-                LIZASPOTIFYWIDGET_VERSION
-            );
-        } catch (Exception $e) {
-            lizaspotifywidget_write_log('Admin Styles Error: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Enqueue editor scripts
-     */
-    public function enqueue_editor_scripts() {
-        try {
-            wp_enqueue_script(
-                'spotify-embed',
-                LIZASPOTIFYWIDGET_URL . 'assets/js/spotify-embed.js',
-                ['jquery'],
-                LIZASPOTIFYWIDGET_VERSION,
-                true
-            );
-
-            wp_localize_script('spotify-embed', 'spotifyConfig', [
-                'clientId'     => get_option('lizaspotifywidget_client_id'),
-                'clientSecret' => get_option('lizaspotifywidget_client_secret'),
-                'i18n'         => [
-                    'searching' => esc_html__('Searching...', 'liza-spotify-widget-for-elementor'),
-                    'error'     => esc_html__('Error searching Spotify. Please try again.', 'liza-spotify-widget-for-elementor'),
-                    'noResults' => esc_html__('No results found.', 'liza-spotify-widget-for-elementor'),
-                ],
-            ]);
-        } catch (Exception $e) {
-            lizaspotifywidget_write_log('Editor Scripts Error: ' . $e->getMessage());
-        }
-    }
-}
-
-// Register activation hook with error handling
-register_activation_hook(__FILE__, function() {
-    try {
-        // Create necessary database tables and options
-        add_option('lizaspotifywidget_client_id', '');
-        add_option('lizaspotifywidget_client_secret', '');
-        add_option('lizaspotifywidget_access_token', '');
-        add_option('lizaspotifywidget_refresh_token', '');
-        add_option('lizaspotifywidget_token_expiry', '');
-    } catch (Exception $e) {
-        lizaspotifywidget_write_log('Activation Error: ' . $e->getMessage());
-    }
-});
-
-// Register deactivation hook with error handling
-register_deactivation_hook(__FILE__, function() {
-    try {
-        // Clean up any temporary data
-        delete_option('lizaspotifywidget_access_token');
-        delete_option('lizaspotifywidget_refresh_token');
-        delete_option('lizaspotifywidget_token_expiry');
-    } catch (Exception $e) {
-        lizaspotifywidget_write_log('Deactivation Error: ' . $e->getMessage());
-    }
-});
+} 

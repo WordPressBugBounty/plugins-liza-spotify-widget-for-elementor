@@ -1,5 +1,5 @@
 <?php
-namespace LizaSpotifyWidget\SpotifyAPI;
+namespace LizaSpotify\SpotifyAPI;
 
 class Client {
     private $client_id;
@@ -9,141 +9,98 @@ class Client {
     private $auth_base = 'https://accounts.spotify.com';
 
     public function __construct() {
-        try {
-            $this->client_id = get_option('lizaspotifywidget_client_id');
-            $this->client_secret = get_option('lizaspotifywidget_client_secret');
-            $this->redirect_uri = admin_url('admin.php?page=lizaspotifywidget-settings');
-        } catch (\Exception $e) {
-            if (function_exists('lizaspotifywidget_write_log')) {
-                lizaspotifywidget_write_log('Spotify Client Constructor Error: ' . $e->getMessage());
-            }
-            throw $e;
-        }
+        $this->client_id = get_option('liza_spotify_client_id');
+        $this->client_secret = get_option('liza_spotify_client_secret');
+        $this->redirect_uri = admin_url('admin.php?page=liza-spotify-settings');
     }
 
     public function get_auth_url() {
-        try {
-            $state = wp_create_nonce('spotify_auth');
-            $scope = 'user-read-private user-read-email user-read-currently-playing user-read-playback-state';
-            
-            $params = array(
-                'response_type' => 'code',
-                'client_id' => $this->client_id,
-                'scope' => $scope,
-                'redirect_uri' => $this->redirect_uri,
-                'state' => $state
-            );
+        $state = wp_create_nonce('spotify_auth');
+        $scope = 'user-read-private user-read-email user-read-currently-playing user-read-playback-state';
+        
+        $params = array(
+            'response_type' => 'code',
+            'client_id' => $this->client_id,
+            'scope' => $scope,
+            'redirect_uri' => $this->redirect_uri,
+            'state' => $state
+        );
 
-            return $this->auth_base . '/authorize?' . http_build_query($params);
-        } catch (\Exception $e) {
-            if (function_exists('lizaspotifywidget_write_log')) {
-                lizaspotifywidget_write_log('Spotify Auth URL Error: ' . $e->getMessage());
-            }
-            throw $e;
-        }
+        return $this->auth_base . '/authorize?' . http_build_query($params);
     }
 
     public function handle_auth_callback($code) {
-        try {
-            $token_url = $this->auth_base . '/api/token';
-            
-            $headers = array(
-                'Authorization' => 'Basic ' . base64_encode($this->client_id . ':' . $this->client_secret)
-            );
-            
-            $body = array(
-                'grant_type' => 'authorization_code',
-                'code' => $code,
-                'redirect_uri' => $this->redirect_uri
-            );
+        $token_url = $this->auth_base . '/api/token';
+        
+        $headers = array(
+            'Authorization' => 'Basic ' . base64_encode($this->client_id . ':' . $this->client_secret)
+        );
+        
+        $body = array(
+            'grant_type' => 'authorization_code',
+            'code' => $code,
+            'redirect_uri' => $this->redirect_uri
+        );
 
-            $response = wp_remote_post($token_url, array(
-                'headers' => $headers,
-                'body' => $body
-            ));
+        $response = wp_remote_post($token_url, array(
+            'headers' => $headers,
+            'body' => $body
+        ));
 
-            if (is_wp_error($response)) {
-                if (function_exists('lizaspotifywidget_write_log')) {
-                    lizaspotifywidget_write_log('Spotify Auth Callback Error: ' . $response->get_error_message());
-                }
-                return false;
-            }
-
-            $data = json_decode(wp_remote_retrieve_body($response), true);
-
-            if (isset($data['access_token'])) {
-                update_option('lizaspotifywidget_access_token', $data['access_token']);
-                update_option('lizaspotifywidget_refresh_token', $data['refresh_token']);
-                update_option('lizaspotifywidget_token_expiry', time() + $data['expires_in']);
-                return true;
-            }
-
-            if (function_exists('lizaspotifywidget_write_log')) {
-                lizaspotifywidget_write_log('Spotify Auth Callback Error: No access token in response');
-            }
-            return false;
-        } catch (\Exception $e) {
-            if (function_exists('lizaspotifywidget_write_log')) {
-                lizaspotifywidget_write_log('Spotify Auth Callback Error: ' . $e->getMessage());
-            }
+        if (is_wp_error($response)) {
             return false;
         }
+
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+
+        if (isset($data['access_token'])) {
+            update_option('liza_spotify_access_token', $data['access_token']);
+            update_option('liza_spotify_refresh_token', $data['refresh_token']);
+            update_option('liza_spotify_token_expiry', time() + $data['expires_in']);
+            return true;
+        }
+
+        return false;
     }
 
     public function refresh_token() {
-        try {
-            $refresh_token = get_option('lizaspotifywidget_refresh_token');
-            if (!$refresh_token) {
-                if (function_exists('lizaspotifywidget_write_log')) {
-                    lizaspotifywidget_write_log('Spotify Refresh Token Error: No refresh token found');
-                }
-                return false;
-            }
-
-            $token_url = $this->auth_base . '/api/token';
-            
-            $headers = array(
-                'Authorization' => 'Basic ' . base64_encode($this->client_id . ':' . $this->client_secret)
-            );
-            
-            $body = array(
-                'grant_type' => 'refresh_token',
-                'refresh_token' => $refresh_token
-            );
-
-            $response = wp_remote_post($token_url, array(
-                'headers' => $headers,
-                'body' => $body
-            ));
-
-            if (is_wp_error($response)) {
-                if (function_exists('lizaspotifywidget_write_log')) {
-                    lizaspotifywidget_write_log('Spotify Refresh Token Error: ' . $response->get_error_message());
-                }
-                return false;
-            }
-
-            $data = json_decode(wp_remote_retrieve_body($response), true);
-
-            if (isset($data['access_token'])) {
-                update_option('lizaspotifywidget_access_token', $data['access_token']);
-                update_option('lizaspotifywidget_token_expiry', time() + $data['expires_in']);
-                if (isset($data['refresh_token'])) {
-                    update_option('lizaspotifywidget_refresh_token', $data['refresh_token']);
-                }
-                return true;
-            }
-
-            if (function_exists('lizaspotifywidget_write_log')) {
-                lizaspotifywidget_write_log('Spotify Refresh Token Error: No access token in response');
-            }
-            return false;
-        } catch (\Exception $e) {
-            if (function_exists('lizaspotifywidget_write_log')) {
-                lizaspotifywidget_write_log('Spotify Refresh Token Error: ' . $e->getMessage());
-            }
+        $refresh_token = get_option('liza_spotify_refresh_token');
+        if (!$refresh_token) {
             return false;
         }
+
+        $token_url = $this->auth_base . '/api/token';
+        
+        $headers = array(
+            'Authorization' => 'Basic ' . base64_encode($this->client_id . ':' . $this->client_secret)
+        );
+        
+        $body = array(
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refresh_token
+        );
+
+        $response = wp_remote_post($token_url, array(
+            'headers' => $headers,
+            'body' => $body
+        ));
+
+        if (is_wp_error($response)) {
+            return false;
+        }
+
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+
+        if (isset($data['access_token'])) {
+            update_option('liza_spotify_access_token', $data['access_token']);
+            update_option('liza_spotify_token_expiry', time() + $data['expires_in']);
+            if (isset($data['refresh_token'])) {
+                update_option('liza_spotify_refresh_token', $data['refresh_token']);
+            }
+            return true;
+        }
+
+        return false;
     }
 
     public function get_user_profile() {
@@ -162,66 +119,42 @@ class Client {
         return $this->make_request('GET', '/artists/' . $artist_id . '/top-tracks', ['market' => $market]);
     }
 
-    public function search($query, $type = 'track', $limit = 5) {
-        return $this->make_request('GET', '/search', [
-            'q' => $query,
-            'type' => $type,
-            'limit' => $limit
-        ]);
-    }
-
     private function make_request($method, $endpoint, $params = array()) {
-        try {
-            if (time() > get_option('lizaspotifywidget_token_expiry', 0)) {
-                if (!$this->refresh_token()) {
-                    if (function_exists('lizaspotifywidget_write_log')) {
-                        lizaspotifywidget_write_log('Spotify Request Error: Failed to refresh token');
-                    }
-                    return false;
-                }
-            }
-
-            $url = $this->api_base . $endpoint;
-            if (!empty($params) && $method === 'GET') {
-                $url .= '?' . http_build_query($params);
-            }
-
-            $args = array(
-                'method' => $method,
-                'headers' => array(
-                    'Authorization' => 'Bearer ' . get_option('lizaspotifywidget_access_token'),
-                    'Content-Type' => 'application/json'
-                )
-            );
-
-            if (!empty($params) && $method !== 'GET') {
-                $args['body'] = json_encode($params);
-            }
-
-            $response = wp_remote_request($url, $args);
-
-            if (is_wp_error($response)) {
-                if (function_exists('lizaspotifywidget_write_log')) {
-                    lizaspotifywidget_write_log('Spotify Request Error: ' . $response->get_error_message());
-                }
+        if (time() > get_option('liza_spotify_token_expiry', 0)) {
+            if (!$this->refresh_token()) {
                 return false;
             }
+        }
 
-            $data = json_decode(wp_remote_retrieve_body($response), true);
+        $url = $this->api_base . $endpoint;
+        if (!empty($params) && $method === 'GET') {
+            $url .= '?' . http_build_query($params);
+        }
 
-            if (wp_remote_retrieve_response_code($response) !== 200) {
-                if (function_exists('lizaspotifywidget_write_log')) {
-                    lizaspotifywidget_write_log('Spotify Request Error: Invalid response code ' . wp_remote_retrieve_response_code($response));
-                }
-                return false;
-            }
+        $args = array(
+            'method' => $method,
+            'headers' => array(
+                'Authorization' => 'Bearer ' . get_option('liza_spotify_access_token'),
+                'Content-Type' => 'application/json'
+            )
+        );
 
-            return $data;
-        } catch (\Exception $e) {
-            if (function_exists('lizaspotifywidget_write_log')) {
-                lizaspotifywidget_write_log('Spotify Request Error: ' . $e->getMessage());
-            }
+        if (!empty($params) && $method !== 'GET') {
+            $args['body'] = json_encode($params);
+        }
+
+        $response = wp_remote_request($url, $args);
+
+        if (is_wp_error($response)) {
             return false;
         }
+
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+
+        if (wp_remote_retrieve_response_code($response) !== 200) {
+            return false;
+        }
+
+        return $data;
     }
 } 
