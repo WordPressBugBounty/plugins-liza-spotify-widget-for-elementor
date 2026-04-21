@@ -6,6 +6,15 @@ use Elementor\Controls_Manager;
 use LizaSpotify\SpotifyAPI\Client;
 
 class SpotifyNowPlaying extends Widget_Base {
+    public function __construct( $data = [], $args = null ) {
+        parent::__construct( $data, $args );
+        wp_register_style( 'liza-spotify-now-playing', LIZA_SPOTIFY_URL . 'assets/css/spotify-now-playing.css', [], LIZA_SPOTIFY_VERSION );
+    }
+
+    public function get_style_depends() {
+        return [ 'liza-spotify-now-playing' ];
+    }
+
     public function get_name() {
         return 'spotify-now-playing';
     }
@@ -450,13 +459,13 @@ class SpotifyNowPlaying extends Widget_Base {
 
     protected function render() {
         global $liza_spotify_fs;
-        
-        if (!$liza_spotify_fs->can_use_premium_code()) {
+
+        if (!$liza_spotify_fs || !$liza_spotify_fs->can_use_premium_code()) {
             ?>
             <div class="spotify-widget-premium-notice">
                 <h3><?php _e('Premium Feature', 'liza-spotify-widget-for-elementor'); ?></h3>
                 <p><?php _e('The Spotify Now Playing widget is only available in the premium version.', 'liza-spotify-widget-for-elementor'); ?></p>
-                <a href="<?php echo esc_url($liza_spotify_fs->get_upgrade_url()); ?>" class="button button-primary" target="_blank">
+                <a href="<?php echo $liza_spotify_fs ? esc_url($liza_spotify_fs->get_upgrade_url()) : '#'; ?>" class="button button-primary" target="_blank">
                     <?php _e('Upgrade to Premium', 'liza-spotify-widget-for-elementor'); ?>
                 </a>
             </div>
@@ -469,12 +478,12 @@ class SpotifyNowPlaying extends Widget_Base {
         $current_track = $client->get_currently_playing();
 
         echo '<div class="spotify-now-playing" data-refresh="' . esc_attr($settings['refresh_interval']) . '">';
-        
+
         if ($current_track && isset($current_track['item'])) {
             $this->render_track($current_track);
         } else {
             echo '<div class="no-track-playing">';
-            echo __('No track currently playing', 'liza-spotify-widget-for-elementor');
+            echo esc_html__('No track currently playing', 'liza-spotify-widget-for-elementor');
             echo '</div>';
         }
 
@@ -486,10 +495,10 @@ class SpotifyNowPlaying extends Widget_Base {
 
     protected function render_track($track_data) {
         $settings = $this->get_settings_for_display();
-        $item = $track_data['item'];
-        $is_playing = $track_data['is_playing'];
-        $progress_ms = $track_data['progress_ms'];
-        $duration_ms = $item['duration_ms'];
+        $item             = $track_data['item'];
+        $is_playing       = $track_data['is_playing'];
+        $progress_ms      = (int) ($track_data['progress_ms'] ?? 0);
+        $duration_ms      = isset($item['duration_ms']) && $item['duration_ms'] > 0 ? (int) $item['duration_ms'] : 1;
         $progress_percent = ($progress_ms / $duration_ms) * 100;
         
         ?>
@@ -524,50 +533,73 @@ class SpotifyNowPlaying extends Widget_Base {
     }
 
     protected function render_script() {
+        $ajax_url = admin_url('admin-ajax.php');
+        $nonce    = wp_create_nonce('spotify_now_playing');
+        $no_track = esc_js(__('No track currently playing', 'liza-spotify-widget-for-elementor'));
         ?>
         <script>
-        jQuery(document).ready(function($) {
+        (function($) {
+            var lizaSpotifyTimer = null;
+
             function updateTrackInfo(widget, data) {
-                if (!data.item) {
-                    widget.html('<div class="no-track-playing"><?php echo esc_js(__('No track currently playing', 'liza-spotify-widget-for-elementor')); ?></div>');
+                if (!data || !data.item) {
+                    widget.html('<div class="no-track-playing"><?php echo $no_track; ?></div>');
                     return;
                 }
-
-                const progressPercent = (data.progress_ms / data.item.duration_ms) * 100;
-                
-                // Update only the dynamic content
-                widget.find('.track-artwork img').attr('src', data.item.album.images[0].url);
-                widget.find('.track-name').text(data.item.name);
-                widget.find('.track-artist').text(data.item.artists.map(artist => artist.name).join(', '));
-                widget.find('.track-album').text(data.item.album.name);
+                var progressPercent = data.item.duration_ms > 0
+                    ? (data.progress_ms / data.item.duration_ms) * 100
+                    : 0;
+                var img = data.item.album && data.item.album.images && data.item.album.images[0]
+                    ? data.item.album.images[0].url : '';
+                if (img) {
+                    widget.find('.track-artwork img').attr('src', img);
+                }
+                widget.find('.track-name').text(data.item.name || '');
+                widget.find('.track-artist').text(
+                    (data.item.artists || []).map(function(a) { return a.name; }).join(', ')
+                );
+                widget.find('.track-album').text(
+                    data.item.album ? data.item.album.name : ''
+                );
                 widget.find('.progress').css('width', progressPercent + '%');
-                widget.find('.listen-now').attr('href', data.item.external_urls.spotify);
+                if (data.item.external_urls && data.item.external_urls.spotify) {
+                    widget.find('.listen-now').attr('href', data.item.external_urls.spotify);
+                }
             }
 
             function refreshNowPlaying() {
                 var widget = $('.elementor-widget-spotify-now-playing .spotify-now-playing');
-                var refreshInterval = widget.data('refresh') * 1000;
+                // Stop polling if the widget has been removed from the DOM
+                if (!widget.length) {
+                    return;
+                }
+                var refreshInterval = Math.max(5, parseInt(widget.data('refresh'), 10) || 5) * 1000;
 
                 $.ajax({
-                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                    url: '<?php echo esc_js($ajax_url); ?>',
                     type: 'POST',
                     data: {
                         action: 'get_now_playing_data',
-                        nonce: '<?php echo wp_create_nonce('spotify_now_playing'); ?>'
-                    },
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            updateTrackInfo(widget, response.data);
-                        }
-                    },
-                    complete: function() {
-                        setTimeout(refreshNowPlaying, refreshInterval);
+                        nonce: '<?php echo esc_js($nonce); ?>'
+                    }
+                })
+                .done(function(response) {
+                    if (response && response.success) {
+                        updateTrackInfo(widget, response.data);
+                    }
+                })
+                .always(function() {
+                    // Re-check DOM before scheduling the next tick
+                    if ($('.elementor-widget-spotify-now-playing .spotify-now-playing').length) {
+                        lizaSpotifyTimer = setTimeout(refreshNowPlaying, refreshInterval);
                     }
                 });
             }
 
-            refreshNowPlaying();
-        });
+            $(document).ready(function() {
+                refreshNowPlaying();
+            });
+        }(jQuery));
         </script>
         <?php
     }

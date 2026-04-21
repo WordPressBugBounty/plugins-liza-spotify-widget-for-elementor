@@ -1,447 +1,142 @@
-.elementor-control-spotify_url {
-    display: none !important;
-}
+/* Spotify Embed Widget Styles */
 
-.spotify-search-wrapper {
-    margin-bottom: 20px;
-}
-
-.spotify-input-tabs {
-    display: flex;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.spotify-input-tab {
-    padding: 8px 12px;
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: #666;
-    font-size: 13px;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-}
-
-.spotify-input-tab.active {
-    color: #1DB954;
-    border-bottom-color: #1DB954;
-}
-
-.spotify-input-tab:hover {
-    color: #1DB954;
-}
-
-.spotify-input-content {
-    display: none;
-}
-
-.spotify-input-content.active {
-    display: block;
-}
-
-.spotify-url-input {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.spotify-url-field {
-    flex: 1;
-    padding: 6px 10px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    font-size: 13px;
-    line-height: 1.3;
-}
-
-.spotify-url-button {
-    padding: 6px 10px;
-    background: #1DB954;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.spotify-url-button:hover {
-    background: #1ed760;
-}
-
-.spotify-url-button .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    line-height: 1;
-}
-
-.spotify-search-input {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.spotify-search-field {
-    flex: 1;
-    padding: 6px 10px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    font-size: 13px;
-    line-height: 1.3;
-}
-
-.spotify-search-button {
-    padding: 6px 10px;
-    background: #1DB954;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.spotify-search-button:hover {
-    background: #1ed760;
-}
-
-.spotify-search-button .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    line-height: 1;
-}
-
-.spotify-search-results {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    background: white;
-}
-
-.spotify-search-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    padding: 3px;
-}
-
-.spotify-search-item {
-    display: flex;
-    align-items: center;
-    padding: 4px 6px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    border-radius: 3px;
-}
-
-.spotify-search-item:hover {
-    background-color: #f1f3f5;
-}
-
-.spotify-search-item-image {
-    width: 24px;
-    height: 24px;
-    margin-right: 6px;
-    flex-shrink: 0;
-}
-
-.spotify-search-item-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 2px;
-}
-
-.spotify-search-item-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.spotify-search-item-title {
-    font-weight: 500;
-    font-size: 12px;
-    margin-bottom: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.spotify-search-item-subtitle {
-    font-size: 11px;
-    color: #a4afb7;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.spotify-search-loading,
-.spotify-search-error,
-.spotify-search-no-results {
-    padding: 6px;
-    text-align: center;
-    color: #a4afb7;
-    font-size: 11px;
-}
-
-.spotify-search-error {
-    color: #dc3232;
-}
-
+/* Main Widget Styles */
 .spotify-embed-wrapper {
-    margin-top: 20px;
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.spotify-embed-placeholder {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    margin: 20px 0;
+    transition: all 0.3s ease;
+}
+
+.spotify-embed-placeholder:hover {
+    border-color: #1db954;
+    background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(29, 185, 84, 0.1);
+}
+
+.spotify-embed-placeholder p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 16px;
+    font-style: italic;
+}
+
+.spotify-embed-wrapper iframe {
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.spotify-embed-wrapper iframe:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
 }
 
 .spotify-embed-error {
-    padding: 15px;
-    background: #f8d7da;
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
     color: #721c24;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
-    margin-bottom: 15px;
-}
-
-.spotify-widget-config-notice {
-    background: #fff;
-    border-left: 4px solid #1DB954;
     padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    text-align: center;
     margin: 20px 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
 }
 
-.spotify-widget-config-notice h3 {
-    margin: 0 0 15px 0;
-    color: #1DB954;
+.spotify-embed-error p {
+    margin: 0;
+    font-size: 1em;
 }
 
-.spotify-widget-config-notice ol {
-    margin: 15px 0;
-    padding-left: 20px;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .spotify-embed-placeholder {
+        padding: 30px 15px;
+    }
+    
+    .spotify-embed-placeholder span {
+        font-size: 36px;
+    }
+    
+    .spotify-embed-placeholder h3 {
+        font-size: 16px;
+    }
+    
+    .spotify-embed-placeholder p {
+        font-size: 14px;
+    }
 }
 
-.spotify-widget-config-notice li {
-    margin-bottom: 10px;
+@media (max-width: 480px) {
+    .spotify-embed-placeholder {
+        padding: 20px 10px;
+    }
+    
+    .spotify-embed-placeholder span {
+        font-size: 32px;
+    }
+    
+    .spotify-embed-placeholder h3 {
+        font-size: 15px;
+    }
+    
+    .spotify-embed-placeholder p {
+        font-size: 13px;
+    }
 }
 
-.spotify-widget-config-notice a {
-    color: #1DB954;
-    text-decoration: none;
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .spotify-embed-placeholder {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .spotify-embed-placeholder:hover {
+        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        border-color: #1db954;
+    }
 }
 
-.spotify-widget-config-notice a:hover {
-    text-decoration: underline;
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .spotify-embed-placeholder {
+        border-width: 2px;
+    }
 }
 
-.elementor-control-search_results .spotify-search-results {
-    margin-top: 10px;
-    max-height: 300px;
-    overflow-y: auto;
-    background: #fff;
-    border: 1px solid #d5dadf;
-    border-radius: 3px;
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .spotify-embed-wrapper,
+    .spotify-embed-placeholder,
+    .spotify-embed-wrapper iframe {
+        transition: none;
+    }
+    
+    .spotify-embed-placeholder:hover,
+    .spotify-embed-wrapper iframe:hover {
+        transform: none;
+    }
 }
 
-.elementor-control-search_results .spotify-search-loading,
-.elementor-control-search_results .spotify-search-error,
-.elementor-control-search_results .spotify-search-no-results {
-    padding: 10px;
-    text-align: center;
-    color: #6d7882;
-    font-size: 12px;
+/* Elementor Editor Specific Styles */
+.elementor-editor-active .spotify-embed-wrapper {
+    pointer-events: auto;
 }
 
-.elementor-control-search_results .spotify-search-error {
-    color: #dc3232;
+/* Widget Preview Styles */
+.elementor-widget-spotify-embed .elementor-widget-container {
+    overflow: visible;
 }
-
-.elementor-control-search_results .spotify-search-list {
-    padding: 5px;
-}
-
-.elementor-control-search_results .spotify-search-item {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: background-color 0.2s;
-}
-
-.elementor-control-search_results .spotify-search-item:hover {
-    background-color: #f1f3f5;
-}
-
-.elementor-control-search_results .spotify-search-item-image {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-    flex-shrink: 0;
-}
-
-.elementor-control-search_results .spotify-search-item-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 3px;
-}
-
-.elementor-control-search_results .spotify-search-item-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.elementor-control-search_results .spotify-search-item-title {
-    font-weight: 500;
-    font-size: 13px;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.elementor-control-search_results .spotify-search-item-subtitle {
-    font-size: 12px;
-    color: #a4afb7;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Hide the URL field since we're using a hidden input */
-.elementor-control-spotify_url {
-    display: none !important;
-}
-
-/* Add some spacing between controls */
-.elementor-control-search_field {
-    margin-bottom: 10px;
-}
-
-/* Style the search input */
-.elementor-control-search_field input[type="search"] {
-    padding-right: 30px;
-    background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23a4afb7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat center right 8px;
-    background-size: 16px;
-}
-
-/* Elementor Panel Styles */
-.elementor-control-spotify-search-wrapper {
-    margin-bottom: 15px;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-results {
-    margin-top: 10px;
-    max-height: 300px;
-    overflow-y: auto;
-    background: #fff;
-    border: 1px solid #d5dadf;
-    border-radius: 3px;
-    padding: 5px;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-loading,
-.elementor-control-spotify-search-wrapper .spotify-search-error,
-.elementor-control-spotify-search-wrapper .spotify-search-no-results {
-    padding: 10px;
-    text-align: center;
-    color: #6d7882;
-    font-size: 12px;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-error {
-    color: #dc3232;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-list {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-item {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: background-color 0.2s;
-    background: #f8f9fa;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-item:hover {
-    background-color: #e9ecef;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-item-image {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-    flex-shrink: 0;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-item-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 3px;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-item-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-item-title {
-    font-weight: 500;
-    font-size: 13px;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #495157;
-}
-
-.elementor-control-spotify-search-wrapper .spotify-search-item-subtitle {
-    font-size: 12px;
-    color: #a4afb7;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Style the content type select */
-.elementor-control-search_type select {
-    width: 100%;
-    padding: 6px 10px;
-    border: 1px solid #d5dadf;
-    border-radius: 3px;
-    background-color: #fff;
-    color: #495157;
-    font-size: 13px;
-    line-height: 1.3;
-}
-
-/* Ensure the search wrapper is visible */
-.spotify-search-wrapper {
-    display: block !important;
-    margin-bottom: 15px;
-}
-
-/* Ensure the search results are visible */
-.spotify-search-results-wrapper {
-    display: block !important;
-    margin-top: 10px;
-}
-
-/* Style the search results container */
-.spotify-search-results {
-    display: block !important;
-    margin-top: 10px;
-    max-height: 300px;
-    overflow-y: auto;
-    background: #fff;
-    border: 1px solid #d5dadf;
-    border-radius: 3px;
-    padding: 5px;
-} 

@@ -11,8 +11,8 @@
  * Requires Plugins:  elementor
  * Plugin URI:        https://ruthlesswp.com/spotify
  * Description:       Spotify Widget For Elementor
- * Version:           3.0 
- * tested up to:      6.8
+ * Version:           4.0.0
+ * Tested up to:      6.9
  * Requires at least: 5.2
  * Requires PHP:      7.0
  * Author:            NikushaSirbiladze/RuthlessWP
@@ -52,6 +52,7 @@ if (function_exists('liza_spotify_fs')) {
                     'has_addons'         => false,
                     'has_paid_plans'     => true,
                     'premium_suffix'      => 'Pro',
+                    'is_org_compliant'   => true,
                     'menu' => array(
                         'slug'           => 'liza-spotify-settings',
                         'first-path'     => 'admin.php?page=liza-spotify-settings',
@@ -83,7 +84,18 @@ if (function_exists('liza_spotify_fs')) {
 
         define('LIZA_SPOTIFY_PATH', plugin_dir_path(__FILE__));
         define('LIZA_SPOTIFY_URL', plugin_dir_url(__FILE__));
-        define('LIZA_SPOTIFY_VERSION', '2.0.0');
+        define('LIZA_SPOTIFY_VERSION', '4.0.0');
+
+        // Activation/deactivation hooks must be registered at file-load time (not inside plugins_loaded)
+        register_activation_hook(__FILE__, function () {
+            add_option('liza_spotify_client_id', '');
+            add_option('liza_spotify_client_secret', '');
+            add_option('liza_spotify_access_token', '');
+            add_option('liza_spotify_refresh_token', '');
+            add_option('liza_spotify_token_expiry', '');
+            add_option('liza_spotify_onboarding_complete', 0);
+            add_option('liza_spotify_onboarding_dismissed', 0);
+        });
 
         // Autoloader
         spl_autoload_register(function ($class) {
@@ -164,48 +176,32 @@ if (function_exists('liza_spotify_fs')) {
             }
 
             private function load_dependencies() {
-                // Load required files
                 require_once LIZA_SPOTIFY_PATH . 'includes/Admin/Settings.php';
+                require_once LIZA_SPOTIFY_PATH . 'includes/Admin/Onboarding.php';
                 require_once LIZA_SPOTIFY_PATH . 'includes/SpotifyAPI/Client.php';
                 require_once LIZA_SPOTIFY_PATH . 'includes/Widgets/WidgetLoader.php';
                 require_once LIZA_SPOTIFY_PATH . 'includes/Ajax/NowPlaying.php';
             }
 
             private function setup_hooks() {
-                // Register activation and deactivation hooks
-                register_activation_hook(__FILE__, [$this, 'activate']);
-                register_deactivation_hook(__FILE__, [$this, 'deactivate']);
-
-                // Initialize admin settings
+                // Initialize admin settings and onboarding
                 if (is_admin()) {
                     new \LizaSpotify\Admin\Settings();
+                    new \LizaSpotify\Admin\Onboarding();
                 }
 
                 // Initialize AJAX handlers
                 new \LizaSpotify\Ajax\NowPlaying();
 
-                // Enqueue styles
-                add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
+                // Enqueue admin styles only on plugin pages
                 add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_styles']);
             }
 
-            public function enqueue_styles() {
-                wp_enqueue_style(
-                    'liza-spotify-now-playing',
-                    LIZA_SPOTIFY_URL . 'assets/css/spotify-now-playing.css',
-                    [],
-                    LIZA_SPOTIFY_VERSION
-                );
-
-                wp_enqueue_style(
-                    'liza-spotify-artist',
-                    LIZA_SPOTIFY_URL . 'assets/css/spotify-artist.css',
-                    [],
-                    LIZA_SPOTIFY_VERSION
-                );
-            }
-
             public function enqueue_admin_styles() {
+                $screen = get_current_screen();
+                if ( ! $screen || strpos( $screen->id, 'liza-spotify' ) === false ) {
+                    return;
+                }
                 wp_enqueue_style(
                     'liza-spotify-admin',
                     LIZA_SPOTIFY_URL . 'assets/css/admin.css',
@@ -214,56 +210,15 @@ if (function_exists('liza_spotify_fs')) {
                 );
             }
 
-            public function show_promo_banner() {
-                // Get the dismissal timestamp
-                $dismissed_time = get_user_meta(get_current_user_id(), 'ruthless_promo_dismissed', true);
-                
-                // If dismissed and 2 days haven't passed yet, don't show
-                if ($dismissed_time && (time() - $dismissed_time < 2 * DAY_IN_SECONDS)) {
-                    return;
-                }
-
-                ?>
-                <div class="notice ruthless-promo-notice is-dismissible">
-                    <div class="ruthless-promo-content">
-                        <span class="ruthless-promo-icon">🎨</span>
-                        <div class="ruthless-promo-text">
-                            <h3><?php _e('Enhance Your Elementor Website with Custom Fonts!', 'liza-spotify-widget-for-elementor'); ?></h3>
-                            <p><?php _e('Take your design to the next level with ', 'liza-spotify-widget-for-elementor'); ?>
-                            <a href="https://www.ruthlesswp.com/plugins/ruthless-custom-fonts-for-elementor" target="_blank">
-                                <?php _e('Ruthless Custom Fonts for Elementor', 'liza-spotify-widget-for-elementor'); ?>
-                            </a>
-                            <?php _e(' - Upload and use any custom font in your Elementor designs.', 'liza-spotify-widget-for-elementor'); ?></p>
-                        </div>
-                        <a href="https://www.ruthlesswp.com/plugins/ruthless-custom-fonts-for-elementor" class="button button-primary" target="_blank">
-                            <?php _e('Learn More', 'liza-spotify-widget-for-elementor'); ?>
-                        </a>
-                    </div>
-                </div>
-                <script>
-                jQuery(document).ready(function($) {
-                    $(document).on('click', '.ruthless-promo-notice .notice-dismiss', function() {
-                        $.ajax({
-                            url: ajaxurl,
-                            type: 'POST',
-                            data: {
-                                action: 'dismiss_ruthless_promo',
-                                nonce: '<?php echo wp_create_nonce('dismiss_ruthless_promo'); ?>'
-                            }
-                        });
-                    });
-                });
-                </script>
-                <?php
-            }
-
             public function activate() {
-                // Create necessary database tables and options
                 add_option('liza_spotify_client_id', '');
                 add_option('liza_spotify_client_secret', '');
                 add_option('liza_spotify_access_token', '');
                 add_option('liza_spotify_refresh_token', '');
                 add_option('liza_spotify_token_expiry', '');
+                // Show onboarding notice to new installs (add_option is a no-op if already set)
+                add_option('liza_spotify_onboarding_complete', 0);
+                add_option('liza_spotify_onboarding_dismissed', 0);
             }
 
             public function deactivate() {

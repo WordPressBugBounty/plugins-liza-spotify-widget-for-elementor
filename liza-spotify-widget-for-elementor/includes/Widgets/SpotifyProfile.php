@@ -769,7 +769,7 @@ class SpotifyProfile extends Widget_Base {
         $profile = $this->spotify_client->get_user_profile();
         
         if (!$profile) {
-            echo '<p>' . __('Please connect your Spotify account in the plugin settings.', 'liza-spotify') . '</p>';
+            echo '<p>' . esc_html__('Please connect your Spotify account in the plugin settings.', 'liza-spotify') . '</p>';
             return;
         }
 

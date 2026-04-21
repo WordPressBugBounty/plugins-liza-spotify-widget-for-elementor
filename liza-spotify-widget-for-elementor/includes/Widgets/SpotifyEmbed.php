@@ -124,15 +124,15 @@ class SpotifyEmbed extends Widget_Base {
         $settings = $this->get_settings_for_display();
         
         if (empty($settings['spotify_url'])) {
-            echo '<div class="spotify-embed-error">' . __('Please enter a Spotify URL.', 'liza-spotify') . '</div>';
+            echo '<div class="spotify-embed-error">' . esc_html__('Please enter a Spotify URL.', 'liza-spotify') . '</div>';
             return;
         }
 
         // Extract the Spotify URI from the URL
         preg_match('/spotify\.com\/(track|album|artist|playlist|episode|show)\/([a-zA-Z0-9]+)/', $settings['spotify_url'], $matches);
-        
+
         if (empty($matches[1]) || empty($matches[2])) {
-            echo '<div class="spotify-embed-error">' . __('Invalid Spotify URL.', 'liza-spotify') . '</div>';
+            echo '<div class="spotify-embed-error">' . esc_html__('Invalid Spotify URL.', 'liza-spotify') . '</div>';
             return;
         }
 

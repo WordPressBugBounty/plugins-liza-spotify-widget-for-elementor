@@ -6,6 +6,15 @@ use Elementor\Controls_Manager;
 use LizaSpotify\SpotifyAPI\Client;
 
 class SpotifyArtist extends Widget_Base {
+    public function __construct( $data = [], $args = null ) {
+        parent::__construct( $data, $args );
+        wp_register_style( 'liza-spotify-artist', LIZA_SPOTIFY_URL . 'assets/css/spotify-artist.css', [], LIZA_SPOTIFY_VERSION );
+    }
+
+    public function get_style_depends() {
+        return [ 'liza-spotify-artist' ];
+    }
+
     public function get_name() {
         return 'spotify-artist';
     }
@@ -393,13 +402,13 @@ class SpotifyArtist extends Widget_Base {
 
     protected function render() {
         global $liza_spotify_fs;
-        
-        if (!$liza_spotify_fs->can_use_premium_code()) {
+
+        if (!$liza_spotify_fs || !$liza_spotify_fs->can_use_premium_code()) {
             ?>
             <div class="spotify-widget-premium-notice">
                 <h3><?php _e('Premium Feature', 'liza-spotify'); ?></h3>
                 <p><?php _e('The Spotify Artist widget is only available in the premium version.', 'liza-spotify'); ?></p>
-                <a href="<?php echo esc_url($liza_spotify_fs->get_upgrade_url()); ?>" class="button button-primary" target="_blank">
+                <a href="<?php echo $liza_spotify_fs ? esc_url($liza_spotify_fs->get_upgrade_url()) : '#'; ?>" class="button button-primary" target="_blank">
                     <?php _e('Upgrade to Premium', 'liza-spotify'); ?>
                 </a>
             </div>
@@ -410,22 +419,29 @@ class SpotifyArtist extends Widget_Base {
         $settings = $this->get_settings_for_display();
         $client = new Client();
 
-        // Extract artist ID from URL or use as is
-        $artist_id = $settings['artist_id'];
+        // Extract artist ID from URL or use as-is
+        $artist_id = sanitize_text_field($settings['artist_id']);
         if (strpos($artist_id, 'spotify.com/artist/') !== false) {
-            preg_match('/artist\/([a-zA-Z0-9]+)/', $artist_id, $matches);
-            $artist_id = $matches[1] ?? '';
+            if (preg_match('/artist\/([a-zA-Z0-9]+)/', $artist_id, $matches)) {
+                $artist_id = $matches[1];
+            } else {
+                $artist_id = '';
+            }
+        }
+        // Also handle spotify:artist:ID URI format
+        if (strpos($artist_id, 'spotify:artist:') === 0) {
+            $artist_id = substr($artist_id, strlen('spotify:artist:'));
         }
 
         if (empty($artist_id)) {
-            echo '<div class="spotify-artist-widget-error">' . __('Please enter a valid Spotify Artist ID or URL.', 'liza-spotify') . '</div>';
+            echo '<div class="spotify-artist-widget-error">' . esc_html__('Please enter a valid Spotify Artist ID or URL.', 'liza-spotify') . '</div>';
             return;
         }
 
         // Get artist data
         $artist_data = $this->get_artist_data($client, $artist_id);
         if (!$artist_data) {
-            echo '<div class="spotify-artist-widget-error">' . __('Unable to fetch artist data.', 'liza-spotify') . '</div>';
+            echo '<div class="spotify-artist-widget-error">' . esc_html__('Unable to fetch artist data.', 'liza-spotify') . '</div>';
             return;
         }
 
@@ -433,17 +449,17 @@ class SpotifyArtist extends Widget_Base {
     }
 
     private function get_artist_data($client, $artist_id) {
-        // Get basic artist info
         $artist = $client->get_artist($artist_id);
-        if (!$artist) {
+        if (!$artist || !is_array($artist)) {
             return false;
         }
 
-        // Get top tracks if enabled
         if ($this->get_settings('show_top_tracks') === 'yes') {
             $top_tracks = $client->get_artist_top_tracks($artist_id);
-            if ($top_tracks) {
-                $artist['top_tracks'] = array_slice($top_tracks, 0, $this->get_settings('top_tracks_count', 5));
+            // Client already extracts the tracks array and caches it
+            if (is_array($top_tracks) && !empty($top_tracks)) {
+                $count               = (int) $this->get_settings('top_tracks_count', 5);
+                $artist['top_tracks'] = array_slice($top_tracks, 0, max(1, min($count, 10)));
             }
         }
 

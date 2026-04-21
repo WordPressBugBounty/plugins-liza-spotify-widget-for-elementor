@@ -40,7 +40,8 @@ class AppleMusicEmbed extends Widget_Base {
             ]
         );
 
-        if (!$liza_spotify_fs->can_use_premium_code() && !$liza_spotify_fs->is_trial()) {
+        if (!$liza_spotify_fs || (!$liza_spotify_fs->can_use_premium_code() && !$liza_spotify_fs->is_trial())) {
+            $upgrade_url = $liza_spotify_fs ? esc_url($liza_spotify_fs->get_upgrade_url()) : '#';
             $this->add_control(
                 'pro_notice',
                 [
@@ -48,7 +49,7 @@ class AppleMusicEmbed extends Widget_Base {
                     'raw' => sprintf(
                         /* translators: %s: Premium version upgrade link */
                         __('This is a premium feature. Please %s to use Apple Music Embed widget.', 'liza-spotify-widget-for-elementor'),
-                        '<a href="' . $liza_spotify_fs->get_upgrade_url() . '">' . __('upgrade to premium', 'liza-spotify-widget-for-elementor') . '</a>'
+                        '<a href="' . $upgrade_url . '">' . __('upgrade to premium', 'liza-spotify-widget-for-elementor') . '</a>'
                     ),
                     'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
                 ]
@@ -138,7 +139,7 @@ class AppleMusicEmbed extends Widget_Base {
 
         if (empty($url)) {
             echo '<div class="elementor-alert elementor-alert-warning">';
-            echo __('Please enter an Apple Music URL.', 'liza-spotify-widget-for-elementor');
+            echo esc_html__('Please enter an Apple Music URL.', 'liza-spotify-widget-for-elementor');
             echo '</div>';
             return;
         }
@@ -190,12 +191,12 @@ class AppleMusicEmbed extends Widget_Base {
             echo '</div>';
         } else {
             echo '<div class="elementor-alert elementor-alert-warning">';
-            echo __('Invalid Apple Music URL. Please enter a valid URL for a song, album, playlist, or artist.', 'liza-spotify-widget-for-elementor');
+            echo esc_html__('Invalid Apple Music URL. Please enter a valid URL for a song, album, playlist, or artist.', 'liza-spotify-widget-for-elementor');
             echo '</div>';
-            
+
             // Add example URLs for users
             echo '<div class="elementor-alert elementor-alert-info">';
-            echo __('Example URLs:', 'liza-spotify-widget-for-elementor');
+            echo esc_html__('Example URLs:', 'liza-spotify-widget-for-elementor');
             echo '<ul>';
             echo '<li>Album: https://music.apple.com/us/album/album-name/1234567890</li>';
             echo '<li>Song: https://music.apple.com/us/album/album-name/1234567890?i=1234567890</li>';

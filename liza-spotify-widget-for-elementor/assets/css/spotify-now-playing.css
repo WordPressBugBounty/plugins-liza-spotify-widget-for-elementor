@@ -1,13 +1,30 @@
+/* =============================================
+   Spotify Now Playing — Spotify Design System
+   ============================================= */
+
 .spotify-now-playing {
+    --sp-green:        #1DB954;
+    --sp-green-hover:  #1ed760;
+    --sp-text:         #FFFFFF;
+    --sp-text-sub:     rgba(255,255,255,.7);
+    --sp-text-muted:   rgba(255,255,255,.4);
+    --sp-border:       rgba(255,255,255,.08);
+    --sp-surface:      rgba(255,255,255,.05);
+    --sp-radius:       4px;
+    --sp-radius-pill:  500px;
+    --sp-transition:   0.15s ease;
+
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     padding: 20px;
     border-radius: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    background: #282828;
 }
 
+/* -- Track layout -- */
 .spotify-now-playing .track-info {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
 }
 
 .spotify-now-playing .track-artwork {
@@ -15,142 +32,123 @@
 }
 
 .spotify-now-playing .track-artwork img {
-    width: 100px;
-    height: 100px;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--sp-radius);
+    object-fit: cover;
+    box-shadow: 0 4px 16px rgba(0,0,0,.4);
 }
 
 .spotify-now-playing .track-details {
-    flex-grow: 1;
+    flex: 1;
     min-width: 0;
-    position: relative;
 }
 
+/* -- Typography -- */
 .spotify-now-playing .track-name {
-    font-size: 1.4em;
-    font-weight: bold;
-    margin-bottom: 5px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--sp-text);
+    line-height: 1.3;
+    margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .spotify-now-playing .track-artist {
-    font-size: 1.1em;
-    margin-bottom: 3px;
-    opacity: 0.9;
+    font-size: 13px;
+    color: var(--sp-text-sub);
+    line-height: 1.4;
+    margin-bottom: 1px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .spotify-now-playing .track-album {
-    font-size: 0.9em;
-    opacity: 0.7;
+    font-size: 12px;
+    color: var(--sp-text-muted);
+    line-height: 1.4;
     margin-bottom: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+/* -- Progress bar -- */
 .spotify-now-playing .progress-bar {
     height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
+    background: var(--sp-border);
+    border-radius: var(--sp-radius-pill);
     overflow: hidden;
-    margin-top: 10px;
+    margin-bottom: 10px;
+    cursor: default;
 }
 
 .spotify-now-playing .progress-bar .progress {
     height: 100%;
-    background: #1DB954;
-    transition: width 0.5s ease;
+    background: var(--sp-green);
+    border-radius: var(--sp-radius-pill);
+    transition: width 0.5s linear;
 }
 
-.spotify-now-playing .no-track-playing {
-    text-align: center;
-    padding: 30px;
-    font-size: 1.1em;
-    opacity: 0.7;
-}
-
+/* -- Listen Now button -- */
 .spotify-now-playing .listen-now {
-    display: inline-block;
-    background: #1DB954;
-    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--sp-green);
+    color: #000;
     text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 15px;
-    font-size: 0.8em;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
-    margin-top: 8px;
+    padding: 5px 14px;
+    border-radius: var(--sp-radius-pill);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    transition: background var(--sp-transition), transform var(--sp-transition);
 }
 
 .spotify-now-playing .listen-now:hover {
-    background: #1ed760;
-    color: white;
+    background: var(--sp-green-hover);
+    color: #000;
+    transform: scale(1.02);
 }
 
 .spotify-now-playing .listen-now svg {
-    width: 12px;
-    height: 12px;
-    margin-right: 4px;
-    vertical-align: middle;
+    width: 11px;
+    height: 11px;
     fill: currentColor;
+    flex-shrink: 0;
 }
 
-.ruthless-promo-banner {
-    background: linear-gradient(135deg, #6b46c1 0%, #805ad5 100%);
-    color: white;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
+/* -- Empty state -- */
+.spotify-now-playing .no-track-playing {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 14px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+    gap: 10px;
+    padding: 24px 16px;
+    font-size: 13px;
+    color: var(--sp-text-muted);
+    text-align: center;
 }
 
-.ruthless-promo-icon {
-    font-size: 20px;
+.spotify-now-playing .no-track-playing::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sp-text-muted);
     flex-shrink: 0;
 }
 
-.ruthless-promo-content {
-    flex-grow: 1;
-    line-height: 1.4;
+/* -- Reduced motion -- */
+@media (prefers-reduced-motion: reduce) {
+    .spotify-now-playing .progress-bar .progress,
+    .spotify-now-playing .listen-now {
+        transition: none;
+    }
 }
-
-.ruthless-promo-content p {
-    margin: 0;
-}
-
-.ruthless-promo-content a {
-    color: #fbd38d;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease;
-}
-
-.ruthless-promo-content a:hover {
-    color: #f6ad55;
-}
-
-.ruthless-promo-close {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 24px;
-    line-height: 1;
-    padding: 0;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: color 0.2s ease;
-}
-
-.ruthless-promo-close:hover {
-    color: white;
-} 
