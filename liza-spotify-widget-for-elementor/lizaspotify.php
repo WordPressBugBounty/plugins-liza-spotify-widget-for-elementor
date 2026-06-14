@@ -11,8 +11,8 @@
  * Requires Plugins:  elementor
  * Plugin URI:        https://ruthlesswp.com/spotify
  * Description:       Spotify Widget For Elementor
- * Version:           4.0.0
- * Tested up to:      6.9
+ * Version:           4.0.1
+ * tested up to:      7.0
  * Requires at least: 5.2
  * Requires PHP:      7.0
  * Author:            NikushaSirbiladze/RuthlessWP
@@ -84,7 +84,7 @@ if (function_exists('liza_spotify_fs')) {
 
         define('LIZA_SPOTIFY_PATH', plugin_dir_path(__FILE__));
         define('LIZA_SPOTIFY_URL', plugin_dir_url(__FILE__));
-        define('LIZA_SPOTIFY_VERSION', '4.0.0');
+        define('LIZA_SPOTIFY_VERSION', '4.0.1');
 
         // Activation/deactivation hooks must be registered at file-load time (not inside plugins_loaded)
         register_activation_hook(__FILE__, function () {
