@@ -10,7 +10,7 @@ class SpotifyEmbed extends Widget_Base {
     }
 
     public function get_title() {
-        return __('Spotify Embed', 'liza-spotify');
+        return __('Spotify Embed', 'liza-spotify-widget-for-elementor');
     }
 
     public function get_icon() {
@@ -25,7 +25,7 @@ class SpotifyEmbed extends Widget_Base {
         $this->start_controls_section(
             'content_section',
             [
-                'label' => __('Spotify URL', 'liza-spotify'),
+                'label' => __('Spotify URL', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_CONTENT,
             ]
         );
@@ -33,22 +33,22 @@ class SpotifyEmbed extends Widget_Base {
         $this->add_control(
             'spotify_url',
             [
-                'label' => __('Spotify URL', 'liza-spotify'),
+                'label' => __('Spotify URL', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::TEXT,
                 'placeholder' => 'https://open.spotify.com/track/...',
-                'description' => __('Enter the Spotify URL for track, album, artist, playlist, or podcast.', 'liza-spotify'),
+                'description' => __('Enter the Spotify URL for track, album, artist, playlist, or podcast.', 'liza-spotify-widget-for-elementor'),
             ]
         );
 
         $this->add_control(
             'theme',
             [
-                'label' => __('Theme', 'liza-spotify'),
+                'label' => __('Theme', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SELECT,
                 'default' => '0',
                 'options' => [
-                    '0' => __('Black', 'liza-spotify'),
-                    '1' => __('White', 'liza-spotify'),
+                    '0' => __('Black', 'liza-spotify-widget-for-elementor'),
+                    '1' => __('White', 'liza-spotify-widget-for-elementor'),
                 ],
             ]
         );
@@ -59,7 +59,7 @@ class SpotifyEmbed extends Widget_Base {
         $this->start_controls_section(
             'style_section',
             [
-                'label' => __('Layout', 'liza-spotify'),
+                'label' => __('Layout', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
@@ -67,7 +67,7 @@ class SpotifyEmbed extends Widget_Base {
         $this->add_responsive_control(
             'width',
             [
-                'label' => __('Width', 'liza-spotify'),
+                'label' => __('Width', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%'],
                 'range' => [
@@ -94,19 +94,19 @@ class SpotifyEmbed extends Widget_Base {
         $this->add_control(
             'alignment',
             [
-                'label' => __('Alignment', 'liza-spotify'),
+                'label' => __('Alignment', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::CHOOSE,
                 'options' => [
                     'left' => [
-                        'title' => __('Left', 'liza-spotify'),
+                        'title' => __('Left', 'liza-spotify-widget-for-elementor'),
                         'icon' => 'eicon-text-align-left',
                     ],
                     'center' => [
-                        'title' => __('Center', 'liza-spotify'),
+                        'title' => __('Center', 'liza-spotify-widget-for-elementor'),
                         'icon' => 'eicon-text-align-center',
                     ],
                     'right' => [
-                        'title' => __('Right', 'liza-spotify'),
+                        'title' => __('Right', 'liza-spotify-widget-for-elementor'),
                         'icon' => 'eicon-text-align-right',
                     ],
                 ],
@@ -124,7 +124,7 @@ class SpotifyEmbed extends Widget_Base {
         $settings = $this->get_settings_for_display();
         
         if (empty($settings['spotify_url'])) {
-            echo '<div class="spotify-embed-error">' . esc_html__('Please enter a Spotify URL.', 'liza-spotify') . '</div>';
+            echo '<div class="spotify-embed-error">' . esc_html__('Please enter a Spotify URL.', 'liza-spotify-widget-for-elementor') . '</div>';
             return;
         }
 
@@ -132,7 +132,7 @@ class SpotifyEmbed extends Widget_Base {
         preg_match('/spotify\.com\/(track|album|artist|playlist|episode|show)\/([a-zA-Z0-9]+)/', $settings['spotify_url'], $matches);
 
         if (empty($matches[1]) || empty($matches[2])) {
-            echo '<div class="spotify-embed-error">' . esc_html__('Invalid Spotify URL.', 'liza-spotify') . '</div>';
+            echo '<div class="spotify-embed-error">' . esc_html__('Invalid Spotify URL.', 'liza-spotify-widget-for-elementor') . '</div>';
             return;
         }
 

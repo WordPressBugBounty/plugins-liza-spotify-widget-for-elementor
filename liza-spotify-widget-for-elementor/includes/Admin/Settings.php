@@ -156,9 +156,11 @@ class Settings {
                         <div class="lssp-upgrade-title"><?php esc_html_e('Unlock Pro Widgets', $td); ?></div>
                         <ul class="lssp-upgrade-list">
                             <li><?php esc_html_e('Now Playing — live track with progress bar', $td); ?></li>
-                            <li><?php esc_html_e('Artist Profile — stats, genres, top tracks', $td); ?></li>
+                            <li><?php esc_html_e('Artist Profile — artist card with follow button', $td); ?></li>
                             <li><?php esc_html_e('Custom Audio Playlist — your own MP3/WAV files', $td); ?></li>
                             <li><?php esc_html_e('Apple Music Embed', $td); ?></li>
+                            <li><?php esc_html_e('Icecast Radio Player — live internet radio streams', $td); ?></li>
+                            <li><?php esc_html_e('Episode Landing Pages — auto-generated SEO pages for every episode', $td); ?></li>
                         </ul>
                     </div>
                     <a href="<?php echo esc_url($liza_spotify_fs->get_upgrade_url()); ?>" class="lssp-btn-upgrade"><?php esc_html_e('Upgrade to Pro', $td); ?></a>

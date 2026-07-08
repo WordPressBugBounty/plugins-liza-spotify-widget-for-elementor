@@ -20,7 +20,7 @@ class SpotifyProfile extends Widget_Base {
     }
 
     public function get_title() {
-        return __('Spotify Profile', 'liza-spotify');
+        return __('Spotify Profile', 'liza-spotify-widget-for-elementor');
     }
 
     public function get_icon() {
@@ -36,7 +36,7 @@ class SpotifyProfile extends Widget_Base {
         $this->start_controls_section(
             'content_section',
             [
-                'label' => __('Content', 'liza-spotify'),
+                'label' => __('Content', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_CONTENT,
             ]
         );
@@ -44,7 +44,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'show_image',
             [
-                'label' => __('Show Profile Image', 'liza-spotify'),
+                'label' => __('Show Profile Image', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SWITCHER,
                 'default' => 'yes',
             ]
@@ -53,7 +53,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'show_followers',
             [
-                'label' => __('Show Followers Count', 'liza-spotify'),
+                'label' => __('Show Followers Count', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SWITCHER,
                 'default' => 'yes',
             ]
@@ -62,7 +62,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'show_spotify_link',
             [
-                'label' => __('Show Follow Button', 'liza-spotify'),
+                'label' => __('Show Follow Button', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SWITCHER,
                 'default' => 'yes',
             ]
@@ -71,7 +71,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'show_button_icon',
             [
-                'label' => __('Show Button Icon', 'liza-spotify'),
+                'label' => __('Show Button Icon', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SWITCHER,
                 'default' => 'yes',
                 'condition' => [
@@ -83,16 +83,16 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'button_icon',
             [
-                'label' => __('Button Icon', 'liza-spotify'),
+                'label' => __('Button Icon', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SELECT,
                 'default' => 'dashicons-spotify',
                 'options' => [
-                    'dashicons-spotify' => __('Spotify', 'liza-spotify'),
-                    'dashicons-external' => __('External Link', 'liza-spotify'),
-                    'dashicons-arrow-right-alt' => __('Arrow Right', 'liza-spotify'),
-                    'dashicons-arrow-right' => __('Arrow', 'liza-spotify'),
-                    'dashicons-plus' => __('Plus', 'liza-spotify'),
-                    'dashicons-controls-play' => __('Play', 'liza-spotify'),
+                    'dashicons-spotify' => __('Spotify', 'liza-spotify-widget-for-elementor'),
+                    'dashicons-external' => __('External Link', 'liza-spotify-widget-for-elementor'),
+                    'dashicons-arrow-right-alt' => __('Arrow Right', 'liza-spotify-widget-for-elementor'),
+                    'dashicons-arrow-right' => __('Arrow', 'liza-spotify-widget-for-elementor'),
+                    'dashicons-plus' => __('Plus', 'liza-spotify-widget-for-elementor'),
+                    'dashicons-controls-play' => __('Play', 'liza-spotify-widget-for-elementor'),
                 ],
                 'condition' => [
                     'show_spotify_link' => 'yes',
@@ -104,7 +104,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'button_heading',
             [
-                'label' => __('Button Settings', 'liza-spotify'),
+                'label' => __('Button Settings', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::HEADING,
                 'separator' => 'before',
                 'condition' => [
@@ -116,10 +116,10 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'button_text',
             [
-                'label' => __('Button Text', 'liza-spotify'),
+                'label' => __('Button Text', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::TEXT,
-                'default' => __('Follow on Spotify', 'liza-spotify'),
-                'placeholder' => __('Follow on Spotify', 'liza-spotify'),
+                'default' => __('Follow on Spotify', 'liza-spotify-widget-for-elementor'),
+                'placeholder' => __('Follow on Spotify', 'liza-spotify-widget-for-elementor'),
                 'condition' => [
                     'show_spotify_link' => 'yes',
                 ],
@@ -129,7 +129,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'button_icon_heading',
             [
-                'label' => __('Content Alignment', 'liza-spotify'),
+                'label' => __('Content Alignment', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::HEADING,
                 'separator' => 'before',
             ]
@@ -139,19 +139,19 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'content_alignment',
             [
-                'label' => __('Content Alignment', 'liza-spotify'),
+                'label' => __('Content Alignment', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::CHOOSE,
                 'options' => [
                     'left' => [
-                        'title' => __('Left', 'liza-spotify'),
+                        'title' => __('Left', 'liza-spotify-widget-for-elementor'),
                         'icon' => 'eicon-text-align-left',
                     ],
                     'center' => [
-                        'title' => __('Center', 'liza-spotify'),
+                        'title' => __('Center', 'liza-spotify-widget-for-elementor'),
                         'icon' => 'eicon-text-align-center',
                     ],
                     'right' => [
-                        'title' => __('Right', 'liza-spotify'),
+                        'title' => __('Right', 'liza-spotify-widget-for-elementor'),
                         'icon' => 'eicon-text-align-right',
                     ],
                 ],
@@ -168,7 +168,7 @@ class SpotifyProfile extends Widget_Base {
         $this->start_controls_section(
             'container_style_section',
             [
-                'label' => __('Container Style', 'liza-spotify'),
+                'label' => __('Container Style', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
@@ -176,19 +176,18 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'background_color',
             [
-                'label' => __('Background Color', 'liza-spotify'),
+                'label' => __('Background Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .spotify-profile-widget' => 'background-color: {{VALUE}};',
                 ],
-                'default' => '#f9f9f9',
             ]
         );
 
         $this->add_responsive_control(
             'container_padding',
             [
-                'label' => __('Padding', 'liza-spotify'),
+                'label' => __('Padding', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', 'em', '%'],
                 'selectors' => [
@@ -216,7 +215,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'container_border_radius',
             [
-                'label' => __('Border Radius', 'liza-spotify'),
+                'label' => __('Border Radius', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%'],
                 'selectors' => [
@@ -239,7 +238,7 @@ class SpotifyProfile extends Widget_Base {
         $this->start_controls_section(
             'image_style_section',
             [
-                'label' => __('Profile Image Style', 'liza-spotify'),
+                'label' => __('Profile Image Style', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
                 'condition' => [
                     'show_image' => 'yes',
@@ -250,7 +249,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'image_size',
             [
-                'label' => __('Image Size', 'liza-spotify'),
+                'label' => __('Image Size', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px'],
                 'range' => [
@@ -273,7 +272,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'image_border_radius',
             [
-                'label' => __('Border Radius', 'liza-spotify'),
+                'label' => __('Border Radius', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%'],
                 'range' => [
@@ -318,7 +317,7 @@ class SpotifyProfile extends Widget_Base {
         $this->start_controls_section(
             'typography_style_section',
             [
-                'label' => __('Typography', 'liza-spotify'),
+                'label' => __('Typography', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
@@ -327,7 +326,7 @@ class SpotifyProfile extends Widget_Base {
             Group_Control_Typography::get_type(),
             [
                 'name' => 'name_typography',
-                'label' => __('Name Typography', 'liza-spotify'),
+                'label' => __('Name Typography', 'liza-spotify-widget-for-elementor'),
                 'selector' => '{{WRAPPER}} .spotify-profile-widget .profile-name',
             ]
         );
@@ -335,7 +334,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_responsive_control(
             'name_spacing',
             [
-                'label' => __('Name Margin', 'liza-spotify'),
+                'label' => __('Name Margin', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', 'em', '%'],
                 'selectors' => [
@@ -348,7 +347,7 @@ class SpotifyProfile extends Widget_Base {
             Group_Control_Typography::get_type(),
             [
                 'name' => 'followers_typography',
-                'label' => __('Followers Typography', 'liza-spotify'),
+                'label' => __('Followers Typography', 'liza-spotify-widget-for-elementor'),
                 'selector' => '{{WRAPPER}} .spotify-profile-widget .profile-followers',
                 'condition' => [
                     'show_followers' => 'yes',
@@ -359,7 +358,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_responsive_control(
             'followers_spacing',
             [
-                'label' => __('Followers Margin', 'liza-spotify'),
+                'label' => __('Followers Margin', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', 'em', '%'],
                 'selectors' => [
@@ -374,7 +373,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'name_color',
             [
-                'label' => __('Name Color', 'liza-spotify'),
+                'label' => __('Name Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .spotify-profile-widget .profile-name' => 'color: {{VALUE}};',
@@ -386,7 +385,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'followers_color',
             [
-                'label' => __('Followers Color', 'liza-spotify'),
+                'label' => __('Followers Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .spotify-profile-widget .profile-followers' => 'color: {{VALUE}};',
@@ -403,7 +402,7 @@ class SpotifyProfile extends Widget_Base {
         $this->start_controls_section(
             'button_style_section',
             [
-                'label' => __('Follow Button Style', 'liza-spotify'),
+                'label' => __('Follow Button Style', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
                 'condition' => [
                     'show_spotify_link' => 'yes',
@@ -415,7 +414,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'section_button_layout',
             [
-                'label' => __('Layout & Sizing', 'liza-spotify'),
+                'label' => __('Layout & Sizing', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::HEADING,
             ]
         );
@@ -423,13 +422,13 @@ class SpotifyProfile extends Widget_Base {
         $this->add_responsive_control(
             'button_width_type',
             [
-                'label' => __('Width Type', 'liza-spotify'),
+                'label' => __('Width Type', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SELECT,
                 'default' => 'auto',
                 'options' => [
-                    'auto' => __('Auto', 'liza-spotify'),
-                    'full' => __('Full Width', 'liza-spotify'),
-                    'custom' => __('Custom', 'liza-spotify'),
+                    'auto' => __('Auto', 'liza-spotify-widget-for-elementor'),
+                    'full' => __('Full Width', 'liza-spotify-widget-for-elementor'),
+                    'custom' => __('Custom', 'liza-spotify-widget-for-elementor'),
                 ],
                 'prefix_class' => 'elementor-button-width-',
             ]
@@ -438,7 +437,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_responsive_control(
             'button_width',
             [
-                'label' => __('Custom Width', 'liza-spotify'),
+                'label' => __('Custom Width', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%'],
                 'range' => [
@@ -463,19 +462,19 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'button_alignment',
             [
-                'label' => __('Alignment', 'liza-spotify'),
+                'label' => __('Alignment', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::CHOOSE,
                 'options' => [
                     'left' => [
-                        'title' => __('Left', 'liza-spotify'),
+                        'title' => __('Left', 'liza-spotify-widget-for-elementor'),
                         'icon' => 'eicon-text-align-left',
                     ],
                     'center' => [
-                        'title' => __('Center', 'liza-spotify'),
+                        'title' => __('Center', 'liza-spotify-widget-for-elementor'),
                         'icon' => 'eicon-text-align-center',
                     ],
                     'right' => [
-                        'title' => __('Right', 'liza-spotify'),
+                        'title' => __('Right', 'liza-spotify-widget-for-elementor'),
                         'icon' => 'eicon-text-align-right',
                     ],
                 ],
@@ -490,7 +489,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'section_button_typography',
             [
-                'label' => __('Typography', 'liza-spotify'),
+                'label' => __('Typography', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::HEADING,
                 'separator' => 'before',
             ]
@@ -507,14 +506,14 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'button_text_transform',
             [
-                'label' => __('Text Transform', 'liza-spotify'),
+                'label' => __('Text Transform', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SELECT,
                 'default' => '',
                 'options' => [
-                    '' => __('Default', 'liza-spotify'),
-                    'uppercase' => __('UPPERCASE', 'liza-spotify'),
-                    'lowercase' => __('lowercase', 'liza-spotify'),
-                    'capitalize' => __('Capitalize', 'liza-spotify'),
+                    '' => __('Default', 'liza-spotify-widget-for-elementor'),
+                    'uppercase' => __('UPPERCASE', 'liza-spotify-widget-for-elementor'),
+                    'lowercase' => __('lowercase', 'liza-spotify-widget-for-elementor'),
+                    'capitalize' => __('Capitalize', 'liza-spotify-widget-for-elementor'),
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .spotify-profile-widget .profile-link a' => 'text-transform: {{VALUE}};',
@@ -525,7 +524,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'button_letter_spacing',
             [
-                'label' => __('Letter Spacing', 'liza-spotify'),
+                'label' => __('Letter Spacing', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SLIDER,
                 'range' => [
                     'px' => [
@@ -544,7 +543,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'section_button_colors',
             [
-                'label' => __('Colors', 'liza-spotify'),
+                'label' => __('Colors', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::HEADING,
                 'separator' => 'before',
             ]
@@ -555,14 +554,14 @@ class SpotifyProfile extends Widget_Base {
         $this->start_controls_tab(
             'button_normal',
             [
-                'label' => __('Normal', 'liza-spotify'),
+                'label' => __('Normal', 'liza-spotify-widget-for-elementor'),
             ]
         );
 
         $this->add_control(
             'button_background_color',
             [
-                'label' => __('Background Color', 'liza-spotify'),
+                'label' => __('Background Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'default' => '#1DB954',
                 'selectors' => [
@@ -574,9 +573,9 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'button_text_color',
             [
-                'label' => __('Text Color', 'liza-spotify'),
+                'label' => __('Text Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '#FFFFFF',
+                'default' => '#06130A',
                 'selectors' => [
                     '{{WRAPPER}} .spotify-profile-widget .profile-link a' => 'color: {{VALUE}};',
                 ],
@@ -588,14 +587,14 @@ class SpotifyProfile extends Widget_Base {
         $this->start_controls_tab(
             'button_hover',
             [
-                'label' => __('Hover', 'liza-spotify'),
+                'label' => __('Hover', 'liza-spotify-widget-for-elementor'),
             ]
         );
 
         $this->add_control(
             'button_background_color_hover',
             [
-                'label' => __('Background Color', 'liza-spotify'),
+                'label' => __('Background Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
                 'default' => '#1ed760',
                 'selectors' => [
@@ -607,9 +606,9 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'button_text_color_hover',
             [
-                'label' => __('Text Color', 'liza-spotify'),
+                'label' => __('Text Color', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '#FFFFFF',
+                'default' => '#06130A',
                 'selectors' => [
                     '{{WRAPPER}} .spotify-profile-widget .profile-link a:hover' => 'color: {{VALUE}};',
                 ],
@@ -624,7 +623,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'section_button_spacing_border',
             [
-                'label' => __('Spacing & Border', 'liza-spotify'),
+                'label' => __('Spacing & Border', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::HEADING,
                 'separator' => 'before',
             ]
@@ -633,7 +632,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_responsive_control(
             'button_margin',
             [
-                'label' => __('Margin', 'liza-spotify'),
+                'label' => __('Margin', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', 'em', '%'],
                 'selectors' => [
@@ -645,7 +644,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_responsive_control(
             'button_padding',
             [
-                'label' => __('Padding', 'liza-spotify'),
+                'label' => __('Padding', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', 'em', '%'],
                 'selectors' => [
@@ -673,17 +672,17 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'button_border_radius',
             [
-                'label' => __('Border Radius', 'liza-spotify'),
+                'label' => __('Border Radius', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%'],
                 'selectors' => [
                     '{{WRAPPER}} .spotify-profile-widget .profile-link a' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
                 'default' => [
-                    'top' => '3',
-                    'right' => '3',
-                    'bottom' => '3',
-                    'left' => '3',
+                    'top' => '999',
+                    'right' => '999',
+                    'bottom' => '999',
+                    'left' => '999',
                     'unit' => 'px',
                     'isLinked' => true,
                 ],
@@ -694,7 +693,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'section_button_icon',
             [
-                'label' => __('Icon Style', 'liza-spotify'),
+                'label' => __('Icon Style', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::HEADING,
                 'separator' => 'before',
                 'condition' => [
@@ -706,7 +705,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'icon_size',
             [
-                'label' => __('Icon Size', 'liza-spotify'),
+                'label' => __('Icon Size', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SLIDER,
                 'range' => [
                     'px' => [
@@ -726,7 +725,7 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'icon_spacing',
             [
-                'label' => __('Icon Spacing', 'liza-spotify'),
+                'label' => __('Icon Spacing', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SLIDER,
                 'range' => [
                     'px' => [
@@ -746,12 +745,12 @@ class SpotifyProfile extends Widget_Base {
         $this->add_control(
             'icon_position',
             [
-                'label' => __('Icon Position', 'liza-spotify'),
+                'label' => __('Icon Position', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SELECT,
                 'default' => 'after',
                 'options' => [
-                    'before' => __('Before', 'liza-spotify'),
-                    'after' => __('After', 'liza-spotify'),
+                    'before' => __('Before', 'liza-spotify-widget-for-elementor'),
+                    'after' => __('After', 'liza-spotify-widget-for-elementor'),
                 ],
                 'prefix_class' => 'elementor-button-icon-position-',
                 'condition' => [
@@ -769,7 +768,7 @@ class SpotifyProfile extends Widget_Base {
         $profile = $this->spotify_client->get_user_profile();
         
         if (!$profile) {
-            echo '<p>' . esc_html__('Please connect your Spotify account in the plugin settings.', 'liza-spotify') . '</p>';
+            echo '<p>' . esc_html__('Please connect your Spotify account in the plugin settings.', 'liza-spotify-widget-for-elementor') . '</p>';
             return;
         }
 
@@ -788,7 +787,7 @@ class SpotifyProfile extends Widget_Base {
             <?php if ('yes' === $settings['show_followers']): ?>
                 <p class="profile-followers">
                     <?php printf(
-                        _n('%s Follower', '%s Followers', $profile['followers']['total'], 'liza-spotify'),
+                        _n('%s Follower', '%s Followers', $profile['followers']['total'], 'liza-spotify-widget-for-elementor'),
                         number_format_i18n($profile['followers']['total'])
                     ); ?>
                 </p>
@@ -812,8 +811,27 @@ class SpotifyProfile extends Widget_Base {
         </div>
 
         <style>
+            .spotify-profile-widget {
+                background-color: #0F1218;
+                background-image: radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.06), transparent 55%);
+                border: 1px solid rgba(255,255,255,.09);
+                border-radius: 20px;
+                box-shadow: 0 24px 48px -24px rgba(0,0,0,.55);
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            }
             .spotify-profile-widget .profile-image {
                 margin-bottom: 15px;
+            }
+            .spotify-profile-widget .profile-image img {
+                box-shadow: 0 16px 32px -14px rgba(0,0,0,.6);
+            }
+            .spotify-profile-widget .profile-name {
+                color: #F2F5F7;
+                font-weight: 800;
+                letter-spacing: -0.02em;
+            }
+            .spotify-profile-widget .profile-followers {
+                color: rgba(242,245,247,.65);
             }
             .spotify-profile-widget .profile-link a {
                 text-decoration: none;
@@ -821,12 +839,24 @@ class SpotifyProfile extends Widget_Base {
                 align-items: center;
                 justify-content: center;
                 gap: 5px;
-                transition: all 0.3s ease;
+                font-weight: 700;
+                transition: background 0.18s ease, transform 0.18s ease;
+            }
+            .spotify-profile-widget .profile-link a:hover {
+                transform: scale(1.03);
             }
             .spotify-profile-widget .profile-link .dashicons {
                 font-size: 16px;
                 width: 16px;
                 height: 16px;
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .spotify-profile-widget .profile-link a {
+                    transition: none;
+                }
+                .spotify-profile-widget .profile-link a:hover {
+                    transform: none;
+                }
             }
         </style>
         <?php

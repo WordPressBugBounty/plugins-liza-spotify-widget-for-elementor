@@ -42,11 +42,28 @@ class SpotifyNowPlaying extends Widget_Base {
         );
 
         $this->add_control(
+            'layout',
+            [
+                'label' => __('Layout', 'liza-spotify-widget-for-elementor'),
+                'type' => Controls_Manager::SELECT,
+                'default' => 'card',
+                'options' => [
+                    'card'    => __('Card (Full Widget)', 'liza-spotify-widget-for-elementor'),
+                    'compact' => __('Compact', 'liza-spotify-widget-for-elementor'),
+                    'inline'  => __('Inline Text', 'liza-spotify-widget-for-elementor'),
+                ],
+            ]
+        );
+
+        $this->add_control(
             'show_artwork',
             [
                 'label' => __('Show Album Artwork', 'liza-spotify-widget-for-elementor'),
                 'type' => Controls_Manager::SWITCHER,
                 'default' => 'yes',
+                'condition' => [
+                    'layout!' => 'inline',
+                ],
             ]
         );
 
@@ -78,6 +95,9 @@ class SpotifyNowPlaying extends Widget_Base {
             [
                 'label' => __('Container', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'layout!' => 'inline',
+                ],
             ]
         );
 
@@ -89,7 +109,6 @@ class SpotifyNowPlaying extends Widget_Base {
                 'selectors' => [
                     '{{WRAPPER}} .spotify-now-playing' => 'background-color: {{VALUE}};',
                 ],
-                'default' => '#282828',
             ]
         );
 
@@ -109,6 +128,9 @@ class SpotifyNowPlaying extends Widget_Base {
                     'left' => '8',
                     'unit' => 'px',
                     'isLinked' => true,
+                ],
+                'condition' => [
+                    'layout' => 'card',
                 ],
             ]
         );
@@ -130,6 +152,9 @@ class SpotifyNowPlaying extends Widget_Base {
                     'unit' => 'px',
                     'isLinked' => true,
                 ],
+                'condition' => [
+                    'layout' => 'card',
+                ],
             ]
         );
 
@@ -143,6 +168,7 @@ class SpotifyNowPlaying extends Widget_Base {
                 'tab' => Controls_Manager::TAB_STYLE,
                 'condition' => [
                     'show_artwork' => 'yes',
+                    'layout!' => 'inline',
                 ],
             ]
         );
@@ -166,6 +192,9 @@ class SpotifyNowPlaying extends Widget_Base {
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .track-artwork img' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
+                ],
+                'condition' => [
+                    'layout' => 'card',
                 ],
             ]
         );
@@ -198,6 +227,9 @@ class SpotifyNowPlaying extends Widget_Base {
             [
                 'label' => __('Track Information', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'layout!' => 'inline',
+                ],
             ]
         );
 
@@ -272,6 +304,9 @@ class SpotifyNowPlaying extends Widget_Base {
             [
                 'label' => __('Progress Bar', 'liza-spotify-widget-for-elementor'),
                 'tab' => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'layout!' => 'inline',
+                ],
             ]
         );
 
@@ -294,6 +329,9 @@ class SpotifyNowPlaying extends Widget_Base {
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .progress-bar' => 'height: {{SIZE}}{{UNIT}};',
+                ],
+                'condition' => [
+                    'layout' => 'card',
                 ],
             ]
         );
@@ -332,6 +370,7 @@ class SpotifyNowPlaying extends Widget_Base {
                 'tab' => Controls_Manager::TAB_STYLE,
                 'condition' => [
                     'show_listen_now' => 'yes',
+                    'layout!' => 'inline',
                 ],
             ]
         );
@@ -431,6 +470,9 @@ class SpotifyNowPlaying extends Widget_Base {
                     'unit' => 'px',
                     'isLinked' => true,
                 ],
+                'condition' => [
+                    'layout' => 'card',
+                ],
             ]
         );
 
@@ -450,6 +492,9 @@ class SpotifyNowPlaying extends Widget_Base {
                     'left' => '12',
                     'unit' => 'px',
                     'isLinked' => false,
+                ],
+                'condition' => [
+                    'layout' => 'card',
                 ],
             ]
         );
@@ -477,7 +522,11 @@ class SpotifyNowPlaying extends Widget_Base {
         $client = new Client();
         $current_track = $client->get_currently_playing();
 
-        echo '<div class="spotify-now-playing" data-refresh="' . esc_attr($settings['refresh_interval']) . '">';
+        $layout = isset($settings['layout']) && in_array($settings['layout'], ['compact', 'inline'], true)
+            ? $settings['layout']
+            : 'card';
+
+        echo '<div class="spotify-now-playing layout-' . esc_attr($layout) . '" data-refresh="' . esc_attr($settings['refresh_interval']) . '">';
 
         if ($current_track && isset($current_track['item'])) {
             $this->render_track($current_track);
@@ -500,10 +549,12 @@ class SpotifyNowPlaying extends Widget_Base {
         $progress_ms      = (int) ($track_data['progress_ms'] ?? 0);
         $duration_ms      = isset($item['duration_ms']) && $item['duration_ms'] > 0 ? (int) $item['duration_ms'] : 1;
         $progress_percent = ($progress_ms / $duration_ms) * 100;
-        
+        // Inline layout is text-only; skip the artwork so the hidden image never loads.
+        $show_artwork     = 'yes' === $settings['show_artwork'] && 'inline' !== ($settings['layout'] ?? 'card');
+
         ?>
         <div class="track-info">
-            <?php if ('yes' === $settings['show_artwork']) : ?>
+            <?php if ($show_artwork) : ?>
             <div class="track-artwork">
                 <img src="<?php echo esc_url($item['album']['images'][0]['url']); ?>" alt="<?php echo esc_attr($item['name']); ?>">
             </div>

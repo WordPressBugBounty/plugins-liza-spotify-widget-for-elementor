@@ -158,20 +158,76 @@ class Client {
         return $data;
     }
 
-    public function get_artist_top_tracks($artist_id, $market = 'US') {
-        $artist_id = sanitize_text_field($artist_id);
-        $cache_key = 'liza_spotify_top_tracks_' . md5($artist_id . $market);
+    public function get_show($show_id, $market = 'US') {
+        $show_id   = sanitize_text_field($show_id);
+        $market    = strtoupper(preg_replace('/[^a-zA-Z]/', '', (string) $market));
+        $market    = $market !== '' ? $market : 'US';
+        $cache_key = 'liza_spotify_show_' . md5($show_id . $market);
         $cached    = get_transient($cache_key);
         if ($cached !== false) {
             return $cached;
         }
-        $response = $this->make_request('GET', '/artists/' . $artist_id . '/top-tracks', ['market' => $market]);
-        // Spotify returns {"tracks": [...]} — extract the array
-        $data = (is_array($response) && isset($response['tracks'])) ? $response['tracks'] : [];
+        // Single call: returns show details plus the first page of episodes
+        $data = $this->make_request('GET', '/shows/' . $show_id, ['market' => $market]);
+        if ($data) {
+            set_transient($cache_key, $data, self::CACHE_TTL_LONG);
+        }
+        return $data;
+    }
+
+    public function get_show_episodes($show_id, $market = 'US', $limit = 50, $offset = 0) {
+        $show_id   = sanitize_text_field($show_id);
+        $market    = strtoupper(preg_replace('/[^a-zA-Z]/', '', (string) $market));
+        $market    = $market !== '' ? $market : 'US';
+        $limit     = max(1, min(50, (int) $limit));
+        $offset    = max(0, (int) $offset);
+        $cache_key = 'liza_spotify_show_eps_' . md5($show_id . $market . $limit . '-' . $offset);
+        $cached    = get_transient($cache_key);
+        if ($cached !== false) {
+            return $cached;
+        }
+        $response = $this->make_request('GET', '/shows/' . $show_id . '/episodes', ['market' => $market, 'limit' => $limit, 'offset' => $offset]);
+        // Spotify returns {"items": [...]} — extract the array
+        $data = (is_array($response) && isset($response['items'])) ? $response['items'] : [];
         if (!empty($data)) {
             set_transient($cache_key, $data, self::CACHE_TTL_LONG);
         }
         return $data;
+    }
+
+    /**
+     * Newest episodes of a show, newest first. Usually served entirely from
+     * the (cached) Get Show call; a second cached call is only made when the
+     * feed is listed oldest-first and the newest episodes sit on the last page.
+     */
+    public function get_latest_episodes($show_id, $market = 'US', $count = 5) {
+        $show = $this->get_show($show_id, $market);
+        if (!$show || !is_array($show)) {
+            return [];
+        }
+        // Unavailable episodes come through as null items — drop them.
+        $items = (isset($show['episodes']['items']) && is_array($show['episodes']['items']))
+            ? array_values(array_filter($show['episodes']['items']))
+            : [];
+        $total = isset($show['episodes']['total']) ? (int) $show['episodes']['total'] : count($items);
+        $count = max(1, min(50, (int) $count));
+
+        if ($total > count($items) && !empty($items)) {
+            $first = (string) ($items[0]['release_date'] ?? '');
+            $last  = (string) ($items[count($items) - 1]['release_date'] ?? '');
+            if ($first !== '' && $first <= $last) {
+                $page = $this->get_show_episodes($show_id, $market, 50, max(0, $total - 50));
+                if (!empty($page)) {
+                    $items = array_values(array_filter($page));
+                }
+            }
+        }
+
+        usort($items, function ($a, $b) {
+            return strcmp((string) ($b['release_date'] ?? ''), (string) ($a['release_date'] ?? ''));
+        });
+
+        return array_slice($items, 0, $count);
     }
 
     public function clear_cache() {

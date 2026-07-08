@@ -41,14 +41,12 @@ class WidgetLoader {
         global $liza_spotify_fs;
 
         // Always register free widgets
-        $this->load_widget('SpotifyEmbed');
-        $this->load_widget('SpotifyProfile');
-
-        if (class_exists(__NAMESPACE__ . '\\SpotifyEmbed')) {
-            $widgets_manager->register(new SpotifyEmbed());
-        }
-        if (class_exists(__NAMESPACE__ . '\\SpotifyProfile')) {
-            $widgets_manager->register(new SpotifyProfile());
+        foreach (['SpotifyEmbed', 'SpotifyProfile', 'SpotifyPodcast'] as $widget) {
+            $this->load_widget($widget);
+            $class = __NAMESPACE__ . '\\' . $widget;
+            if (class_exists($class)) {
+                $widgets_manager->register(new $class());
+            }
         }
 
         // Register premium widgets when user has access

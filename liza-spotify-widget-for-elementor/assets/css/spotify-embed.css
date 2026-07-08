@@ -1,142 +1,121 @@
-/* Spotify Embed Widget Styles */
+/* ==================================================
+   Spotify Embed Widget — Liza Studio Design System
+   ================================================== */
 
-/* Main Widget Styles */
 .spotify-embed-wrapper {
     width: 100%;
     text-align: center;
     margin: 0 auto;
-    transition: all 0.3s ease;
 }
 
+/* -- Placeholder (no URL yet) -- */
 .spotify-embed-placeholder {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border: 2px dashed #dee2e6;
-    border-radius: 12px;
-    padding: 40px 20px;
+    background-color: #0F1218;
+    background-image: radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.06), transparent 55%);
+    border: 1px dashed rgba(255,255,255,.18);
+    border-radius: 20px;
+    padding: 44px 24px;
     text-align: center;
     margin: 20px 0;
-    transition: all 0.3s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    transition: border-color .18s ease;
 }
 
 .spotify-embed-placeholder:hover {
-    border-color: #1db954;
-    background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(29, 185, 84, 0.1);
+    border-color: #1DB954;
+}
+
+.spotify-embed-placeholder .placeholder-icon {
+    width: 36px;
+    height: 36px;
+    fill: rgba(242,245,247,.4);
+    display: block;
+    margin: 0 auto 14px;
+}
+
+.spotify-embed-placeholder h3 {
+    margin: 0 0 6px;
+    color: #F2F5F7;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .spotify-embed-placeholder p {
     margin: 0;
-    color: #6c757d;
-    font-size: 16px;
-    font-style: italic;
+    color: rgba(242,245,247,.6);
+    font-size: 13px;
+    font-style: normal;
+    line-height: 1.5;
 }
 
+/* -- Embed frame -- */
 .spotify-embed-wrapper iframe {
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
+    border-radius: 16px;
+    box-shadow: 0 24px 48px -24px rgba(0,0,0,.5);
+    transition: box-shadow .18s ease, transform .18s ease;
 }
 
 .spotify-embed-wrapper iframe:hover {
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 28px 56px -24px rgba(0,0,0,.6);
     transform: translateY(-2px);
 }
 
+/* -- Error -- */
 .spotify-embed-error {
-    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-    color: #721c24;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #f5c6cb;
+    background: rgba(255,61,61,.12);
+    border: 1px solid rgba(255,61,61,.25);
+    color: #FF6B6B;
+    padding: 16px 20px;
+    border-radius: 12px;
     text-align: center;
     margin: 20px 0;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+    font-size: 13px;
 }
 
 .spotify-embed-error p {
     margin: 0;
-    font-size: 1em;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .spotify-embed-placeholder {
-        padding: 30px 15px;
-    }
-    
-    .spotify-embed-placeholder span {
-        font-size: 36px;
-    }
-    
-    .spotify-embed-placeholder h3 {
-        font-size: 16px;
-    }
-    
-    .spotify-embed-placeholder p {
-        font-size: 14px;
-    }
-}
-
+/* -- Responsive -- */
 @media (max-width: 480px) {
     .spotify-embed-placeholder {
-        padding: 20px 10px;
+        padding: 32px 16px;
     }
-    
-    .spotify-embed-placeholder span {
-        font-size: 32px;
-    }
-    
+
     .spotify-embed-placeholder h3 {
         font-size: 15px;
     }
-    
+
     .spotify-embed-placeholder p {
-        font-size: 13px;
+        font-size: 12px;
     }
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    .spotify-embed-placeholder {
-        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-        border-color: #4a5568;
-        color: #e2e8f0;
-    }
-    
-    .spotify-embed-placeholder:hover {
-        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-        border-color: #1db954;
-    }
-}
-
-/* High Contrast Mode Support */
+/* -- High contrast -- */
 @media (prefers-contrast: high) {
     .spotify-embed-placeholder {
         border-width: 2px;
     }
 }
 
-/* Reduced Motion Support */
+/* -- Reduced motion -- */
 @media (prefers-reduced-motion: reduce) {
-    .spotify-embed-wrapper,
     .spotify-embed-placeholder,
     .spotify-embed-wrapper iframe {
         transition: none;
     }
-    
-    .spotify-embed-placeholder:hover,
+
     .spotify-embed-wrapper iframe:hover {
         transform: none;
     }
 }
 
-/* Elementor Editor Specific Styles */
+/* -- Elementor editor -- */
 .elementor-editor-active .spotify-embed-wrapper {
     pointer-events: auto;
 }
 
-/* Widget Preview Styles */
 .elementor-widget-spotify-embed .elementor-widget-container {
     overflow: visible;
 }

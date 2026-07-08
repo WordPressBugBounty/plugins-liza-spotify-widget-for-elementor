@@ -8,12 +8,11 @@
  *
  * @liza-spotify-widget-for-elementor
  * Plugin Name:       Liza Widget For Spotify and Elementor
- * Requires Plugins:  elementor
  * Plugin URI:        https://ruthlesswp.com/spotify
- * Description:       Spotify Widget For Elementor
- * Version:           4.0.1
+ * Description:       Spotify widgets for Elementor and Gutenberg (block editor).
+ * Version:           4.2.0
  * tested up to:      7.0
- * Requires at least: 5.2
+ * Requires at least: 5.8
  * Requires PHP:      7.0
  * Author:            NikushaSirbiladze/RuthlessWP
  * Author URI:        https://ruthlesswp.com
@@ -84,7 +83,7 @@ if (function_exists('liza_spotify_fs')) {
 
         define('LIZA_SPOTIFY_PATH', plugin_dir_path(__FILE__));
         define('LIZA_SPOTIFY_URL', plugin_dir_url(__FILE__));
-        define('LIZA_SPOTIFY_VERSION', '4.0.1');
+        define('LIZA_SPOTIFY_VERSION', '4.2.0');
 
         // Activation/deactivation hooks must be registered at file-load time (not inside plugins_loaded)
         register_activation_hook(__FILE__, function () {
@@ -131,21 +130,18 @@ if (function_exists('liza_spotify_fs')) {
             }
 
             public function init() {
-                // Check if Elementor is installed and activated
-                if (!did_action('elementor/loaded')) {
-                    add_action('admin_notices', [$this, 'elementor_missing_notice']);
-                    return;
-                }
-
-                // Load plugin components
+                // Load plugin components (works with or without Elementor)
                 $this->load_dependencies();
                 $this->setup_hooks();
 
-                // Initialize widgets
-                if (class_exists('\Elementor\Plugin')) {
+                // Gutenberg blocks are registered regardless of Elementor
+                new \LizaSpotify\Blocks\BlockLoader();
+
+                // Elementor widgets only when Elementor is installed and activated
+                if (did_action('elementor/loaded') && class_exists('\Elementor\Plugin')) {
                     // Add Elementor widget category
                     add_action('elementor/elements/categories_registered', [$this, 'add_elementor_widget_category']);
-                    
+
                     // Initialize widget loader
                     new \LizaSpotify\Widgets\WidgetLoader();
                 }
@@ -159,20 +155,6 @@ if (function_exists('liza_spotify_fs')) {
                         'icon' => 'eicon-spotify',
                     ]
                 );
-            }
-
-            public function elementor_missing_notice() {
-                if (isset($_GET['activate'])) {
-                    unset($_GET['activate']);
-                }
-
-                $message = sprintf(
-                    esc_html__('"%1$s" requires "%2$s" to be installed and activated.', 'liza-spotify-widget-for-elementor'),
-                    '<strong>' . esc_html__('Liza Spotify Widgets Pro', 'liza-spotify-widget-for-elementor') . '</strong>',
-                    '<strong>' . esc_html__('Elementor', 'liza-spotify-widget-for-elementor') . '</strong>'
-                );
-
-                printf('<div class="notice notice-warning is-dismissible"><p>%1$s</p></div>', $message);
             }
 
             private function load_dependencies() {
