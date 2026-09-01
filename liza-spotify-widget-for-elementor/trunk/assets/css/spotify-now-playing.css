@@ -1,0 +1,316 @@
+/* ==================================================
+   Spotify Now Playing — Liza Studio Design System
+   ================================================== */
+
+.spotify-now-playing {
+    --lsw-ink:          #0F1218;
+    --lsw-surface:      rgba(255,255,255,.045);
+    --lsw-surface-2:    rgba(255,255,255,.08);
+    --lsw-line:         rgba(255,255,255,.09);
+    --lsw-text:         #F2F5F7;
+    --lsw-text-sub:     rgba(242,245,247,.65);
+    --lsw-text-faint:   rgba(242,245,247,.4);
+    --lsw-accent:       #1DB954;
+    --lsw-accent-2:     #1ED760;
+    --lsw-on-accent:    #06130A;
+    --lsw-radius:       20px;
+    --lsw-radius-sm:    12px;
+    --lsw-radius-pill:  999px;
+    --lsw-transition:   .18s ease;
+
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    padding: 20px;
+    border-radius: var(--lsw-radius);
+    background-color: var(--lsw-ink);
+    background-image: radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.06), transparent 55%);
+    border: 1px solid var(--lsw-line);
+    box-shadow: 0 24px 48px -24px rgba(0,0,0,.55);
+    color: var(--lsw-text);
+}
+
+/* -- Track layout -- */
+.spotify-now-playing .track-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.spotify-now-playing .track-artwork {
+    flex-shrink: 0;
+}
+
+.spotify-now-playing .track-artwork img {
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--lsw-radius-sm);
+    object-fit: cover;
+    box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--lsw-accent) 45%, transparent);
+}
+
+.spotify-now-playing .track-details {
+    flex: 1;
+    min-width: 0;
+}
+
+/* -- Typography -- */
+.spotify-now-playing .track-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--lsw-text);
+    line-height: 1.3;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spotify-now-playing .track-artist {
+    font-size: 13px;
+    color: var(--lsw-text-sub);
+    line-height: 1.4;
+    margin-bottom: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spotify-now-playing .track-album {
+    font-size: 12px;
+    color: var(--lsw-text-faint);
+    line-height: 1.4;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* -- Progress bar -- */
+.spotify-now-playing .progress-bar {
+    height: 4px;
+    background: var(--lsw-surface-2);
+    border-radius: var(--lsw-radius-pill);
+    overflow: hidden;
+    margin-bottom: 10px;
+    cursor: default;
+}
+
+.spotify-now-playing .progress-bar .progress {
+    height: 100%;
+    background: var(--lsw-accent);
+    border-radius: var(--lsw-radius-pill);
+    transition: width .5s linear;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--lsw-accent) 40%, transparent);
+}
+
+/* -- Listen Now button -- */
+.spotify-now-playing .listen-now {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--lsw-accent);
+    color: var(--lsw-on-accent);
+    text-decoration: none;
+    padding: 6px 15px;
+    border-radius: var(--lsw-radius-pill);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    transition: background var(--lsw-transition), transform var(--lsw-transition);
+}
+
+.spotify-now-playing .listen-now:hover {
+    background: var(--lsw-accent-2);
+    color: var(--lsw-on-accent);
+    transform: scale(1.03);
+}
+
+.spotify-now-playing .listen-now svg {
+    width: 11px;
+    height: 11px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+/* -- Empty state -- */
+.spotify-now-playing .no-track-playing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px 16px;
+    font-size: 13px;
+    color: var(--lsw-text-faint);
+    text-align: center;
+}
+
+.spotify-now-playing .no-track-playing::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--lsw-text-faint);
+    flex-shrink: 0;
+}
+
+/* ==================================================
+   Layout variants
+   ================================================== */
+
+/* -- Compact: slim horizontal bar, no album line -- */
+.spotify-now-playing.layout-compact {
+    padding: 10px 14px;
+    border-radius: 14px;
+}
+
+.spotify-now-playing.layout-compact .track-info {
+    position: relative;
+    gap: 12px;
+}
+
+.spotify-now-playing.layout-compact .track-info:has(.listen-now) {
+    padding-right: 42px;
+}
+
+.spotify-now-playing.layout-compact .track-artwork img {
+    width: 44px;
+    height: 44px;
+}
+
+.spotify-now-playing.layout-compact .track-album {
+    display: none;
+}
+
+.spotify-now-playing.layout-compact .track-name {
+    font-size: 13px;
+    margin-bottom: 0;
+}
+
+.spotify-now-playing.layout-compact .track-artist {
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.spotify-now-playing.layout-compact .progress-bar {
+    height: 3px;
+    margin-bottom: 0;
+}
+
+/* Icon-only Listen Now button, vertically centered on the right */
+.spotify-now-playing.layout-compact .listen-now {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    gap: 0;
+    padding: 9px;
+    font-size: 0;
+    line-height: 0;
+}
+
+.spotify-now-playing.layout-compact .listen-now svg {
+    width: 14px;
+    height: 14px;
+}
+
+.spotify-now-playing.layout-compact .listen-now:hover {
+    transform: translateY(-50%) scale(1.05);
+}
+
+.spotify-now-playing.layout-compact .no-track-playing {
+    padding: 8px 4px;
+    font-size: 12px;
+}
+
+/* -- Inline: plain text that flows with surrounding content -- */
+.spotify-now-playing.layout-inline {
+    display: inline;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    font-family: inherit;
+    color: inherit;
+}
+
+.spotify-now-playing.layout-inline .track-info,
+.spotify-now-playing.layout-inline .track-details {
+    display: inline;
+}
+
+.spotify-now-playing.layout-inline .track-artwork,
+.spotify-now-playing.layout-inline .track-album,
+.spotify-now-playing.layout-inline .progress-bar {
+    display: none;
+}
+
+.spotify-now-playing.layout-inline .track-info::before {
+    content: '♪';
+    color: var(--lsw-accent);
+    margin-right: .35em;
+}
+
+.spotify-now-playing.layout-inline .track-name,
+.spotify-now-playing.layout-inline .track-artist {
+    display: inline;
+    margin: 0;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    white-space: normal;
+}
+
+.spotify-now-playing.layout-inline .track-name {
+    font-weight: 600;
+}
+
+.spotify-now-playing.layout-inline .track-artist::before {
+    content: ' — ';
+}
+
+/* Listen Now collapses to a small Spotify icon after the text */
+.spotify-now-playing.layout-inline .listen-now {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: -.1em;
+    margin-left: .4em;
+    gap: 0;
+    padding: 0;
+    background: none;
+    font-size: 0;
+    line-height: 0;
+    color: var(--lsw-accent);
+}
+
+.spotify-now-playing.layout-inline .listen-now svg {
+    width: 15px;
+    height: 15px;
+}
+
+.spotify-now-playing.layout-inline .listen-now:hover {
+    background: none;
+    color: var(--lsw-accent-2);
+    transform: none;
+}
+
+.spotify-now-playing.layout-inline .no-track-playing {
+    display: inline;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    text-align: inherit;
+}
+
+.spotify-now-playing.layout-inline .no-track-playing::before {
+    display: none;
+}
+
+/* -- Reduced motion -- */
+@media (prefers-reduced-motion: reduce) {
+    .spotify-now-playing .progress-bar .progress,
+    .spotify-now-playing .listen-now {
+        transition: none;
+    }
+}

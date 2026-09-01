@@ -1,0 +1,189 @@
+/* ==================================================
+   Spotify Artist Widget — Liza Studio Design System
+   ================================================== */
+
+.spotify-artist-widget {
+    --lsw-ink:          #0F1218;
+    --lsw-surface:      rgba(255,255,255,.045);
+    --lsw-surface-2:    rgba(255,255,255,.08);
+    --lsw-line:         rgba(255,255,255,.09);
+    --lsw-text:         #F2F5F7;
+    --lsw-text-sub:     rgba(242,245,247,.65);
+    --lsw-text-faint:   rgba(242,245,247,.4);
+    --lsw-accent:       #1DB954;
+    --lsw-accent-2:     #1ED760;
+    --lsw-on-accent:    #06130A;
+    --lsw-radius:       20px;
+    --lsw-radius-sm:    12px;
+    --lsw-radius-pill:  999px;
+    --lsw-transition:   .18s ease;
+
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    background-color: var(--lsw-ink);
+    background-image: radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.06), transparent 55%);
+    border: 1px solid var(--lsw-line);
+    border-radius: var(--lsw-radius);
+    box-shadow: 0 24px 48px -24px rgba(0,0,0,.55);
+    padding: 24px;
+    color: var(--lsw-text);
+}
+
+/* -- Layouts -- */
+.spotify-artist-widget.layout-horizontal {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+.spotify-artist-widget.layout-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.spotify-artist-widget.layout-compact {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.spotify-artist-widget.layout-compact .artist-image img {
+    width: 64px !important;
+    height: 64px !important;
+}
+
+/* -- Artist image -- */
+.spotify-artist-widget .artist-image {
+    flex-shrink: 0;
+}
+
+.spotify-artist-widget .artist-image img {
+    display: block;
+    object-fit: cover;
+    box-shadow: 0 16px 32px -14px rgba(0,0,0,.6);
+}
+
+/* -- Artist info -- */
+.spotify-artist-widget .artist-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.spotify-artist-widget .artist-name {
+    margin: 0 0 12px;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--lsw-text);
+}
+
+.layout-compact .artist-name {
+    font-size: 17px;
+    margin-bottom: 6px;
+}
+
+/* -- Follow button -- */
+.spotify-artist-widget .follow-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 22px;
+    background: var(--lsw-accent);
+    color: var(--lsw-on-accent);
+    text-decoration: none;
+    border-radius: var(--lsw-radius-pill);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    transition: background var(--lsw-transition), transform var(--lsw-transition);
+    box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--lsw-accent) 60%, transparent);
+}
+
+.spotify-artist-widget .follow-button:hover {
+    background: var(--lsw-accent-2);
+    color: var(--lsw-on-accent);
+    transform: scale(1.03);
+}
+
+.spotify-artist-widget .follow-button .spotify-icon {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+/* -- Error state -- */
+.spotify-artist-widget-error {
+    padding: 20px;
+    background: rgba(255,61,61,.08);
+    border: 1px solid rgba(255,61,61,.2);
+    color: #FF6B6B;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* -- Premium notice -- */
+.spotify-widget-premium-notice {
+    text-align: center;
+    padding: 28px 20px;
+    background-color: #0F1218;
+    background-image: radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,.06), transparent 55%);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.09);
+    color: #F2F5F7;
+}
+
+.spotify-widget-premium-notice h3 {
+    margin: 0 0 8px;
+    color: #1DB954;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.spotify-widget-premium-notice p {
+    margin: 0 0 16px;
+    color: rgba(242,245,247,.65);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.spotify-widget-premium-notice .button-primary {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 22px;
+    background: #1DB954;
+    color: #06130A !important;
+    text-decoration: none;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    transition: background .18s ease;
+}
+
+.spotify-widget-premium-notice .button-primary:hover {
+    background: #1ED760;
+}
+
+/* -- Responsive -- */
+@media (max-width: 600px) {
+    .spotify-artist-widget.layout-horizontal {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .spotify-artist-widget .artist-name {
+        font-size: 18px;
+    }
+}
+
+/* -- Reduced motion -- */
+@media (prefers-reduced-motion: reduce) {
+    .spotify-artist-widget .follow-button {
+        transition: none;
+    }
+}
