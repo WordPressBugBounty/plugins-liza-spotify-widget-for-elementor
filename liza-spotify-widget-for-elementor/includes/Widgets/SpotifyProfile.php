@@ -787,7 +787,7 @@ class SpotifyProfile extends Widget_Base {
             <?php if ('yes' === $settings['show_followers']): ?>
                 <p class="profile-followers">
                     <?php printf(
-                        _n('%s Follower', '%s Followers', $profile['followers']['total'], 'liza-spotify-widget-for-elementor'),
+                        esc_html(_n('%s Follower', '%s Followers', $profile['followers']['total'], 'liza-spotify-widget-for-elementor')),
                         number_format_i18n($profile['followers']['total'])
                     ); ?>
                 </p>

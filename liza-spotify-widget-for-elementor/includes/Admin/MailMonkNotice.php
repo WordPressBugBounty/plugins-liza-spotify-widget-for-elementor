@@ -54,24 +54,43 @@ class MailMonkNotice {
                 <span class="liza-mm-badge"><?php esc_html_e('From the makers of Liza', 'liza-spotify-widget-for-elementor'); ?></span>
 
                 <h2 class="liza-mm-title">
-                    <?php esc_html_e('Still running your business on', 'liza-spotify-widget-for-elementor'); ?>
-                    <span class="liza-mm-mark">@gmail.com</span>?
+                    <?php esc_html_e('Your site looks pro.', 'liza-spotify-widget-for-elementor'); ?>
+                    <span class="liza-mm-mark"><?php esc_html_e('Does your inbox?', 'liza-spotify-widget-for-elementor'); ?></span>
                 </h2>
 
                 <p class="liza-mm-sub">
-                    <?php esc_html_e('MailMonk gives you email at your own domain. Bring a domain, paste three DNS records, and start sending from an address that is actually yours.', 'liza-spotify-widget-for-elementor'); ?>
+                    <?php esc_html_e('Clients notice when hello@yourstudio.com replies from yourstudio@gmail.com. Mailmonk puts real email on the domain you already own. It works in Gmail, Outlook and Apple Mail, and it’s live in five minutes.', 'liza-spotify-widget-for-elementor'); ?>
                 </p>
+
+                <ul class="liza-mm-perks">
+                    <li><?php esc_html_e('2 mailboxes free, for good', 'liza-spotify-widget-for-elementor'); ?></li>
+                    <li><?php esc_html_e('3 DNS records, not 15', 'liza-spotify-widget-for-elementor'); ?></li>
+                    <li><?php esc_html_e('No Google Workspace bill', 'liza-spotify-widget-for-elementor'); ?></li>
+                </ul>
             </div>
 
-            <a class="liza-mm-cta" href="<?php echo esc_url(self::URL); ?>" target="_blank" rel="noopener">
-                <span class="liza-mm-cta-icon" aria-hidden="true">
-                    <span class="liza-mm-cta-rail">
-                        <span class="liza-mm-cta-arrow">&rarr;</span>
-                        <span class="liza-mm-cta-arrow">&rarr;</span>
+            <div class="liza-mm-action">
+                <a class="liza-mm-cta" href="<?php echo esc_url(self::URL); ?>" target="_blank" rel="noopener">
+                    <span class="liza-mm-cta-icon" aria-hidden="true">
+                        <span class="liza-mm-cta-rail">
+                            <span class="liza-mm-cta-arrow">&rarr;</span>
+                            <span class="liza-mm-cta-arrow">&rarr;</span>
+                        </span>
                     </span>
-                </span>
-                <span class="liza-mm-cta-label"><?php esc_html_e('Get started', 'liza-spotify-widget-for-elementor'); ?></span>
-            </a>
+                    <span class="liza-mm-cta-label"><?php esc_html_e('Get my free address', 'liza-spotify-widget-for-elementor'); ?></span>
+                </a>
+
+                <p class="liza-mm-promo">
+                    <?php
+                    printf(
+                        /* translators: 1: promo code, 2: what the promo code unlocks */
+                        esc_html__('Liza users: code %1$s for %2$s', 'liza-spotify-widget-for-elementor'),
+                        '<code class="liza-mm-code">LIZA</code>',
+                        '<strong>' . esc_html__('3 months of Pro free', 'liza-spotify-widget-for-elementor') . '</strong>'
+                    );
+                    ?>
+                </p>
+            </div>
         </div>
 
         <script>
@@ -154,8 +173,10 @@ class MailMonkNotice {
             padding: 0 2px;
         }
 
-        .liza-mm-sub {
+        /* Scoped under the notice so core's `.notice p` margins don't win. */
+        .liza-mm-notice .liza-mm-sub {
             margin: 0;
+            padding: 0;
             max-width: 60ch;
             font-size: 13.5px;
             font-weight: 400;
@@ -164,7 +185,50 @@ class MailMonkNotice {
             color: #4a4a45;
         }
 
+        .liza-mm-perks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+            margin: 12px 0 0;
+            padding: 0;
+            list-style: none;
+        }
+        .liza-mm-perks li {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin: 0;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.4;
+            color: #111;
+        }
+        /* A small lime chip per tick, echoing the badge. */
+        .liza-mm-perks li::before {
+            content: '✓';
+            display: flex;
+            flex: none;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 5px;
+            background: #c3fd61;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1;
+            color: #111;
+        }
+
         /* ------------------------------------------------------------- cta -- */
+
+        .liza-mm-action {
+            display: flex;
+            flex: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
 
         .liza-mm-cta {
             display: flex;
@@ -235,6 +299,31 @@ class MailMonkNotice {
             white-space: pre;
         }
 
+        .liza-mm-notice .liza-mm-promo {
+            margin: 0;
+            padding: 0;
+            font-size: 12.5px;
+            line-height: 1.4;
+            color: #4a4a45;
+            text-align: center;
+        }
+        .liza-mm-promo strong { font-weight: 600; color: #111; }
+        .liza-mm-code {
+            display: inline-block;
+            margin: 0 1px;
+            padding: 2px 6px;
+            border: 1px dashed #111;
+            border-radius: 6px;
+            background: #fffefc;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: #111;
+            /* One click selects the whole code, ready to copy. */
+            user-select: all;
+        }
+
         /* ----------------------------------------------------------- close -- */
 
         .liza-mm-close {
@@ -255,7 +344,9 @@ class MailMonkNotice {
         @media (max-width: 782px) {
             .liza-mm-notice { padding: 20px; gap: 18px; }
             .liza-mm-title { font-size: 17px; }
-            .liza-mm-cta { width: 100%; justify-content: flex-start; }
+            .liza-mm-action { width: 100%; align-items: stretch; }
+            .liza-mm-cta { justify-content: flex-start; }
+            .liza-mm-notice .liza-mm-promo { text-align: left; }
         }
 
         @media (prefers-reduced-motion: reduce) {

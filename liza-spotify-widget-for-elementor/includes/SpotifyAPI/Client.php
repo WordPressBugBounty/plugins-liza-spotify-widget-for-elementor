@@ -144,8 +144,20 @@ class Client {
         return $data;
     }
 
+    /**
+     * Spotify IDs are base62. Anything else would let a block/widget author
+     * steer the request path (e.g. "../me") onto other endpoints that are
+     * called with the site owner's token.
+     */
+    private function is_valid_id($id) {
+        return is_string($id) && preg_match('/^[A-Za-z0-9]{1,64}$/', $id) === 1;
+    }
+
     public function get_artist($artist_id) {
         $artist_id = sanitize_text_field($artist_id);
+        if (!$this->is_valid_id($artist_id)) {
+            return false;
+        }
         $cache_key = 'liza_spotify_artist_' . md5($artist_id);
         $cached    = get_transient($cache_key);
         if ($cached !== false) {
@@ -160,6 +172,9 @@ class Client {
 
     public function get_show($show_id, $market = 'US') {
         $show_id   = sanitize_text_field($show_id);
+        if (!$this->is_valid_id($show_id)) {
+            return false;
+        }
         $market    = strtoupper(preg_replace('/[^a-zA-Z]/', '', (string) $market));
         $market    = $market !== '' ? $market : 'US';
         $cache_key = 'liza_spotify_show_' . md5($show_id . $market);
@@ -177,6 +192,9 @@ class Client {
 
     public function get_show_episodes($show_id, $market = 'US', $limit = 50, $offset = 0) {
         $show_id   = sanitize_text_field($show_id);
+        if (!$this->is_valid_id($show_id)) {
+            return [];
+        }
         $market    = strtoupper(preg_replace('/[^a-zA-Z]/', '', (string) $market));
         $market    = $market !== '' ? $market : 'US';
         $limit     = max(1, min(50, (int) $limit));

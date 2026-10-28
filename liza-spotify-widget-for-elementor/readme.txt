@@ -1,7 +1,7 @@
 === Liza Widget For Spotify and Elementor ===
 Contributors: fallentroj, freemius
 Tags: spotify, elementor, gutenberg, podcast, music player
-Stable tag: 4.3.0
+Stable tag: 4.4.0
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.0
@@ -84,6 +84,13 @@ Post in the [plugin support forum](https://wordpress.org/support/plugin/liza-spo
 
 == Changelog ==
 
+= 4.4.0 =
+* Security: Updated the bundled Freemius SDK from 2.10.1 to 2.13.5, fixing a reflected cross-site scripting issue in the SDK (CVE-2024-13362).
+* Security: Spotify artist and show IDs are now validated before they are used in Spotify API requests.
+* Security: Hardened admin code — API credentials are sanitized on save, the onboarding dismiss action checks user capabilities, and all widget strings are escaped on output.
+* Fixed: The Spotify connect callback now only runs on the plugin's settings page, so it no longer interrupts other plugins' sign-in flows.
+* Refreshed the MailMonk notice with new copy and a promo code for Liza users.
+
 = 4.3.0 =
 * Tested up to WordPress 7.1.
 * Added a dismissible notice introducing MailMonk, our custom-domain email product. It appears once after installing or updating and can be closed at any time.
@@ -112,6 +119,9 @@ Post in the [plugin support forum](https://wordpress.org/support/plugin/liza-spo
 * Performance and stability improvements.
 
 == Upgrade Notice ==
+
+= 4.4.0 =
+Security update: bundled Freemius SDK updated to 2.13.5 (fixes CVE-2024-13362) plus input validation and output escaping hardening. Update recommended.
 
 = 4.3.0 =
 Compatibility update for WordPress 7.1.

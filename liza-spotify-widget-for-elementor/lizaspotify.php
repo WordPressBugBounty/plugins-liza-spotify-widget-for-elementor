@@ -10,7 +10,7 @@
  * Plugin Name:       Liza Widget For Spotify and Elementor
  * Plugin URI:        https://ruthlesswp.com/spotify
  * Description:       Spotify widgets for Elementor and Gutenberg (block editor).
- * Version:           4.3.0
+ * Version:           4.4.0
  * tested up to:      7.1
  * Requires at least: 5.8
  * Requires PHP:      7.0
@@ -83,7 +83,7 @@ if (function_exists('liza_spotify_fs')) {
 
         define('LIZA_SPOTIFY_PATH', plugin_dir_path(__FILE__));
         define('LIZA_SPOTIFY_URL', plugin_dir_url(__FILE__));
-        define('LIZA_SPOTIFY_VERSION', '4.3.0');
+        define('LIZA_SPOTIFY_VERSION', '4.4.0');
 
         // Activation/deactivation hooks must be registered at file-load time (not inside plugins_loaded)
         register_activation_hook(__FILE__, function () {

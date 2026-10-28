@@ -66,6 +66,9 @@ class Onboarding {
 
     public function ajax_dismiss() {
         check_ajax_referer('liza_spotify_dismiss_onboarding', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error();
+        }
         update_option(self::OPTION_DISMISSED, 1);
         wp_send_json_success();
     }

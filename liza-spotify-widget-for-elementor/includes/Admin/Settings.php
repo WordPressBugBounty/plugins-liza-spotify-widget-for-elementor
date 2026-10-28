@@ -93,7 +93,7 @@ class Settings {
                         </div>
                         <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=liza-spotify-settings&disconnect=1'), 'spotify_disconnect')); ?>"
                            class="lssp-btn-ghost lssp-btn-disconnect"
-                           onclick="return confirm('<?php esc_attr_e('Disconnect your Spotify account?', $td); ?>');">
+                           onclick="return confirm('<?php echo esc_js(__('Disconnect your Spotify account?', $td)); ?>');">
                             <?php esc_html_e('Disconnect', $td); ?>
                         </a>
                     <?php else : ?>
@@ -316,12 +316,18 @@ class Settings {
     }
 
     public function page_init() {
-        register_setting('liza_spotify_options', 'liza_spotify_client_id');
-        register_setting('liza_spotify_options', 'liza_spotify_client_secret');
+        register_setting('liza_spotify_options', 'liza_spotify_client_id', ['sanitize_callback' => 'sanitize_text_field']);
+        register_setting('liza_spotify_options', 'liza_spotify_client_secret', ['sanitize_callback' => 'sanitize_text_field']);
     }
 
     public function handle_spotify_callback() {
         if (!isset($_GET['code']) || !isset($_GET['state'])) {
+            return;
+        }
+        // Spotify only ever redirects back to our own settings page; other
+        // plugins' OAuth callbacks use the same param names and must not be
+        // intercepted (the nonce check below would wp_die() on them).
+        if (!isset($_GET['page']) || 'liza-spotify-settings' !== $_GET['page']) {
             return;
         }
         if (!current_user_can('manage_options')) {
